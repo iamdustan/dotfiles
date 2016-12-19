@@ -1,0 +1,31 @@
+if &compatible
+  set nocompatible
+end
+
+com! -nargs=+  -bar Plugin call VundleToPlug("Plugin", <args>)
+com! -nargs=+  -bar Bundle call VundleToPlug("Bundle", <args>)
+
+call plug#begin('~/.vim/bundle')
+
+" The Basics
+Plug 'christoomey/vim-run-interactive'
+Plug 'ctrlpvim/ctrlp.vim'
+Plug 'pbrisbin/vim-mkdir'
+Plug 'scrooloose/syntastic'
+Plug 'tpope/vim-eunuch'
+Plug 'tpope/vim-fugitive'
+Plug 'tpope/vim-repeat'
+Plug 'tpope/vim-surround'
+Plug 'vim-scripts/tComment'
+Plug 'scrooloose/nerdtree'
+
+" The Color
+Plug 'mhartington/oceanic-next'
+
+" The JS
+
+" The Ocaml
+
+" The Rust
+
+call plug#end()
