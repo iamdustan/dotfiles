@@ -15,3 +15,4 @@ if [[ `uname` == 'Linux' ]]; then
   TERM=xterm
 fi
 
+export EDITOR="nvim"

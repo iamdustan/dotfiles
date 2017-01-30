@@ -127,7 +127,7 @@ print_success() {
 declare -a FILES_TO_SYMLINK=$(find dotfiles -type f -name ".*" -not -name .DS_Store -not -name .git -not -name .osx | sed -e 's|//|/|')
 # | sed -e 's|./.|.|')
 echo $FILES_TO_SYMLINK
-FILES_TO_SYMLINK="$FILES_TO_SYMLINK .vim bin .config/fish" # add in vim and the binaries
+FILES_TO_SYMLINK="$FILES_TO_SYMLINK bin" # add in vim and the binaries
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
