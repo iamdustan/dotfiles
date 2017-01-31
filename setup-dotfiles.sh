@@ -126,7 +126,6 @@ print_success() {
 # finds all .dotfiles in this folder
 declare -a FILES_TO_SYMLINK=$(find dotfiles -type f -name ".*" -not -name .DS_Store -not -name .git -not -name .osx | sed -e 's|//|/|')
 # | sed -e 's|./.|.|')
-echo $FILES_TO_SYMLINK
 FILES_TO_SYMLINK="$FILES_TO_SYMLINK bin" # add in vim and the binaries
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -141,7 +140,6 @@ main() {
 
         sourceFile="$(pwd)/$i"
         targetFile="$HOME/$(printf "%s" "$i" | sed "s/.*\/\(.*\)/\1/g")"
-	echo $sourceFile
 
         if [ -e "$targetFile" ]; then
             if [ "$(readlink "$targetFile")" != "$sourceFile" ]; then
@@ -165,5 +163,9 @@ main() {
 
 }
 
+print_info "Symlinking dotfiles"
+
 main
+
+print_info "  Finished symlinking dotfiles"
 
