@@ -59,6 +59,29 @@ install_nvm() {
   fi
 }
 
+install_node() {
+  # TODO install these independently
+  if ! cmd_exists "node"
+  then
+    nvm install v4.4.4 &>/dev/null
+    nvm install v7 &>/dev/null
+    print_success "node v4.4.4 installed"
+    print_success "node v7.x.x installed"
+  else
+    print_success "node v4.4.4 already installed"
+    print_success "node v7.x.x already installed"
+  fi
+
+  if ! cmd_exists "yarn"
+  then
+    brew install yarn &>/dev/null
+
+    print_success "yarn installed"
+  else
+    print_success "yarn already installed"
+  fi
+}
+
 install_rustup() {
   if ! cmd_exists "cargo"
   then
@@ -127,6 +150,7 @@ install_hub
 install_tmux
 install_zsh
 install_ag
+install_node
 
 print_info "  Finished installing base applications"
 

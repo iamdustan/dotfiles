@@ -8,6 +8,8 @@ ZSH_THEME="robbyrussell"
 # Uncomment the following line to enable command auto-correction.
 ENABLE_CORRECTION="true"
 
+EDITOR="nvim"
+
 plugins=(git)
 
 source $ZSH/oh-my-zsh.sh

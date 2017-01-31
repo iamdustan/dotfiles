@@ -15,4 +15,6 @@ if [[ `uname` == 'Linux' ]]; then
   TERM=xterm
 fi
 
-export EDITOR="nvim"
+[ -s "$HOME/.config/env" ] && \. "$HOME/.config/env"
+
+export EDITOR=nvim
