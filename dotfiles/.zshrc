@@ -71,7 +71,6 @@ bindkey -s "^T" "^[Isudo ^[A" # "t" for "toughguy"
 # aliases
 [[ -f ~/.aliases ]] && source ~/.aliases
 
-
 # Local config
 [[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
 
