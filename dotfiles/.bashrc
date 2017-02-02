@@ -17,4 +17,5 @@ fi
 
 [ -s "$HOME/.config/env" ] && \. "$HOME/.config/env"
 
+EDITOR=nvim
 export EDITOR=nvim

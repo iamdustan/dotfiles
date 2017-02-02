@@ -71,12 +71,16 @@ bindkey -s "^T" "^[Isudo ^[A" # "t" for "toughguy"
 # aliases
 [[ -f ~/.aliases ]] && source ~/.aliases
 
+
 # Local config
 [[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
 
 export PATH="$HOME/.yarn/bin:$PATH"
 
+# nvm
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh" # This loads nvm
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+
+# cargo
 source $HOME/.cargo/env
 
