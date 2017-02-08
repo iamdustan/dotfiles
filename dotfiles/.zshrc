@@ -83,3 +83,6 @@ export NVM_DIR="$HOME/.nvm"
 # cargo
 source $HOME/.cargo/env
 
+# ocaml
+eval `opam config env`
+

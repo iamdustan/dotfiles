@@ -82,6 +82,29 @@ install_node() {
   fi
 }
 
+install_ocaml() {
+  # TODO install these independently
+  if ! cmd_exists "opam"
+  then
+    brew install ocaml &>/dev/null
+    print_success "ocaml installed"
+
+    brew install opam &>/dev/null
+    print_success "opam installed"
+  else
+    print_success "ocaml already installed"
+    print_success "opam already installed"
+  fi
+
+  if ! cmd_exists "yarn"
+  then
+    brew install yarn &>/dev/null
+
+  else
+    print_success "yarn already installed"
+  fi
+}
+
 install_rustup() {
   if ! cmd_exists "cargo"
   then
@@ -151,6 +174,7 @@ install_tmux
 install_zsh
 install_ag
 install_node
+install_ocaml
 
 print_info "  Finished installing base applications"
 
