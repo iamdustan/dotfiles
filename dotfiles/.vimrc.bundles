@@ -24,6 +24,8 @@ Plug 'mhartington/oceanic-next'
 
 " The JS
 
+Plug 'flowtype/vim-flow'
+
 " The Ocaml
 
 " The Rust

@@ -75,6 +75,7 @@ bindkey -s "^T" "^[Isudo ^[A" # "t" for "toughguy"
 [[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
 
 export PATH="$HOME/.yarn/bin:$PATH"
+export PATH="node_modules/.bin:$PATH"
 
 # nvm
 export NVM_DIR="$HOME/.nvm"
