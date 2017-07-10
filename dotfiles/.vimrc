@@ -44,6 +44,7 @@ augroup vimrcEx
   autocmd BufRead,BufNewFile Appraisals set filetype=ruby
   autocmd BufRead,BufNewFile *.md set filetype=markdown
   autocmd BufRead,BufNewFile .{jscs,jshint,eslint}rc set filetype=json
+  autocmd BufRead,BufNewFile *.{js,jsx} set suffixesadd+=.js,.jsx
 augroup END
 
 " When the type of shell script is /bin/sh, assume a POSIX-compatible
@@ -78,6 +79,15 @@ if executable('ag')
     nnoremap \ :Ag<SPACE>
   endif
 endif
+
+augroup quickfix
+  autocmd!
+  autocmd QuickFixCmdPost [^l]* cwindow
+  autocmd QuickFixCmdPost l*    lwindow
+
+  nnoremap [q :cprev<cr>
+  nnoremap ]q :cnext<cr>
+augroup END
 
 " Make it obvious where 80 characters is
 set textwidth=80
