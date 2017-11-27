@@ -1,9 +1,8 @@
 
 # Path to your oh-my-zsh installation.
 export ZSH=$HOME/.oh-my-zsh
-
 # https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
-ZSH_THEME="robbyrussell"
+ZSH_THEME="theunraveler"
 
 # Uncomment the following line to enable command auto-correction.
 ENABLE_CORRECTION="true"

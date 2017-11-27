@@ -6,3 +6,5 @@ node_modules/
 tags
 tmp
 vendor
+.buildkite
+.github

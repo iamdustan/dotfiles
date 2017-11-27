@@ -28,7 +28,10 @@ Plug 'mhartington/oceanic-next'
 Plug 'flowtype/vim-flow'
 
 " The Ocaml
+Plug 'reasonml-editor/vim-reason-plus'
 
 " The Rust
+Plug 'rust-lang/rust.vim'
+Plug 'racer-rust/vim-racer'
 
 call plug#end()
