@@ -194,7 +194,65 @@ nmap k gk
 nmap <Leader>n :NERDTreeToggle<CR>
 
 " cmd+s to save
-nnoremap <silent> <C-S> :<C-u>Update<CR>
-inoremap <c-s> <c-o>:Update<CR>
+" 
+" nnoremap <silent> <C-S> :<C-u>Update<CR>
+" inoremap <c-s> <c-o>:Update<CR>
+nnoremap <silent> <C-S> :w<CR>
+inoremap <c-s> <c-o>:w<CR>
 vmap <C-s> <esc>:w<CR>gv
 
+
+map <M-s> :w<kEnter> "Works in normal mode, must press Esc first"
+let g:airline_powerline_fonts = 1
+" function! isBattery()
+"   let value = system("$(pmset -g ps | head -1) =~ \"Battery Power\")
+"   echo "value " . value
+"   return value
+" endfunction
+" 
+" if (isBattery()) {
+"   let g:ale_lint_on_text_changed = 'never'
+"   " if you don't want linters to run on opening a file
+"   let g:ale_lint_on_enter = 0
+" }
+
+set hidden
+if has('nvim')
+  tnoremap <Esc> <C-\><C-n>
+  let g:LanguageClient_serverCommands = {
+  \ 'reason': ['ocaml-language-server', '--stdio'],
+  \ 'ocaml': ['ocaml-language-server', '--stdio'],
+  \ 'javascript': ['flow-language-server', '--stdio'],
+  \ 'javascript.jsx': ['flow-language-server', '--stdio'],
+  \}
+  let g:LanguageClient_selectionUI = "fzf"
+  let g:LanguageClient_diagnosticsList = "Location"
+  let g:LanguageClient_loggingLevel = 'DEBUG'
+
+  " nnoremap <silent> gd :call LanguageClient_textDocument_definition()<cr>
+  " nnoremap <silent> gf :call LanguageClient_textDocument_formatting()<cr>
+  nnoremap <silent> <cr> :call LanguageClient_textDocument_hover()<cr>
+endif
+
+command! -bang -nargs=* Find call fzf#vim#grep('rg --column --line-number --no-heading --fixed-strings --ignore-case --no-ignore --hidden --follow --glob "!.git/*" --color "always" '.shellescape(<q-args>), 1, <bang>0)
+set grepprg=rg\ --vimgrep
+
+""" FocusMode
+function! ToggleFocusMode()
+  if (&foldcolumn != 12)
+    set laststatus=0
+    set numberwidth=10
+    set foldcolumn=12
+    set noruler
+    hi FoldColumn ctermbg=none
+    hi LineNr ctermfg=0 ctermbg=none
+    hi NonText ctermfg=0
+  else
+    set laststatus=2
+    set numberwidth=4
+    set foldcolumn=0
+    set ruler
+    execute 'colorscheme ' . g:colors_name
+  endif
+endfunc
+nnoremap <F1> :call ToggleFocusMode()<cr>

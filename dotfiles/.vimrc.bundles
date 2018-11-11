@@ -11,7 +11,7 @@ call plug#begin('~/.vim/bundle')
 Plug 'christoomey/vim-run-interactive'
 Plug 'ctrlpvim/ctrlp.vim'
 Plug 'pbrisbin/vim-mkdir'
-Plug 'scrooloose/syntastic'
+Plug 'w0rp/ale'
 Plug 'tpope/vim-eunuch'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-rhubarb'
@@ -19,13 +19,26 @@ Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-surround'
 Plug 'vim-scripts/tComment'
 Plug 'scrooloose/nerdtree'
+Plug 'vim-airline/vim-airline'
+Plug 'tweekmonster/startuptime.vim'
+Plug 'autozimu/LanguageClient-neovim', {
+    \ 'branch': 'next',
+    \ 'do': 'bash install.sh',
+    \ }
+" (Optional) Multi-entry selection UI.
+Plug 'junegunn/fzf'
 
 " The Color
 Plug 'mhartington/oceanic-next'
+Plug 'chriskempson/tomorrow-theme'
+
+
 
 " The JS
 
-Plug 'flowtype/vim-flow'
+Plug 'prettier/vim-prettier', {
+  \ 'do': 'yarn install',
+  \ 'for': ['javascript', 'json', 'graphql', 'markdown'] }
 
 " The Ocaml
 Plug 'reasonml-editor/vim-reason-plus'
