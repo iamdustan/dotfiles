@@ -25,23 +25,29 @@ Plug 'autozimu/LanguageClient-neovim', {
     \ 'branch': 'next',
     \ 'do': 'bash install.sh',
     \ }
+Plug 'vimwiki/vimwiki'
+Plug 'yuttie/comfortable-motion.vim'
 " (Optional) Multi-entry selection UI.
 Plug 'junegunn/fzf'
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+
+" Scheme toys
+Plug 'Olical/vim-scheme', { 'for': 'scheme', 'on': 'SchemeConnect' }
+Plug 'guns/vim-sexp'
+Plug 'tpope/vim-sexp-mappings-for-regular-people'
 
 " The Color
 Plug 'mhartington/oceanic-next'
 Plug 'chriskempson/tomorrow-theme'
 
-
-
 " The JS
-
 Plug 'prettier/vim-prettier', {
   \ 'do': 'yarn install',
   \ 'for': ['javascript', 'json', 'graphql', 'markdown'] }
 
 " The Ocaml
 Plug 'reasonml-editor/vim-reason-plus'
+Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 
 " The Rust
 Plug 'rust-lang/rust.vim'

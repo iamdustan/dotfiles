@@ -1,4 +1,5 @@
 
+export NODE_ENV='development'
 export LS_OPTIONS='--color=auto'
 eval "`dircolors`"
 force_color_prompt=yes
@@ -16,7 +17,17 @@ if [[ `uname` == 'Linux' ]]; then
 fi
 
 [ -s "$HOME/.config/env" ] && \. "$HOME/.config/env"
-[ -s "$HOME/.aliases" ] && \. "$HOME/.config/.aliases"
+[ -s "$HOME/.config/.aliases" ] && \. "$HOME/.config/.aliases"
 
 EDITOR=nvim
 export EDITOR=nvim
+
+# --files: List files that would be searched but do not search
+# --no-ignore: Do not respect .gitignore, etc...
+# --hidden: Search hidden files and folders
+# --follow: Follow symlinks
+# --glob: Additional conditions for search (in this case ignore everything in the .git/ folder)
+export FZF_DEFAULT_COMMAND='rg --files --no-ignore --hidden --follow --glob "!.git/*"'
+
+
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash

@@ -3,3 +3,4 @@ if [ -x "$(command -v "hub")" ]; then
   alias git=hub
 fi
 
+alias refreshen="clear && printf '\e[3J'"

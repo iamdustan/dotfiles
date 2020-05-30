@@ -5,11 +5,11 @@ export ZSH=$HOME/.oh-my-zsh
 ZSH_THEME="theunraveler"
 
 # Uncomment the following line to enable command auto-correction.
-ENABLE_CORRECTION="true"
+# ENABLE_CORRECTION="true"
 
 EDITOR="nvim"
 
-plugins=(git)
+plugins=(git yarn docker)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -19,6 +19,7 @@ bindkey jj vi-cmd-mode
 
 # aliases
 [[ -f ~/.aliases ]] && source ~/.aliases
+[[ -f ~/.config/.aliases ]] && source ~/.config/.aliases
 
 # load our own completion functions
 fpath=(~/.zsh/completion /usr/local/share/zsh/site-functions $fpath)
@@ -78,8 +79,11 @@ export PATH="$HOME/.yarn/bin:$PATH"
 export PATH="node_modules/.bin:$PATH"
 
 # nvm
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+# export NVM_DIR="$HOME/.nvm"
+# [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+
+# fnm
+eval "$(fnm env --multi)"
 
 # cargo
 source $HOME/.cargo/env
@@ -87,3 +91,5 @@ source $HOME/.cargo/env
 # ocaml
 eval `opam config env`
 
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh

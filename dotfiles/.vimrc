@@ -145,19 +145,27 @@ nnoremap <C-h> <C-w>h
 nnoremap <C-l> <C-w>l
 
 " configure syntastic syntax checking to check on open as well as save
-let g:syntastic_check_on_open=1
-let g:syntastic_html_tidy_ignore_errors=[" proprietary attribute \"ng-"]
-let g:syntastic_eruby_ruby_quiet_messages =
-    \ {"regex": "possibly useless use of a variable in void context"}
-
-let g:syntastic_javascript_checkers = ['eslint']
-let g:syntastic_javascript_eslint_exe = '$(npm bin)/eslint'
-let g:flow#enable = 0
+" let g:syntastic_check_on_open=0
+" let g:syntastic_html_tidy_ignore_errors=[" proprietary attribute \"ng-"]
+" let g:syntastic_eruby_ruby_quiet_messages = {"regex": "possibly useless use of a variable in void context"}
+" 
+" let g:syntastic_javascript_checkers = ['eslint']
+" let g:syntastic_javascript_eslint_exe = '$(npm bin)/eslint'
 
 " let g:syntastic_error_symbol = '❌'
 " let g:syntastic_style_error_symbol = '⁉️'
-let g:syntastic_warning_symbol = '⚠️'
-let g:syntastic_style_warning_symbol = '💩'
+" let g:syntastic_warning_symbol = '⚠️'
+" let g:syntastic_style_warning_symbol = '💩'
+" let g:syntastic_error_symbol = 'X'
+" let g:syntastic_style_error_symbol = 'x'
+" let g:syntastic_warning_symbol = '?'
+" let g:syntastic_style_warning_symbol = '?'
+
+let g:ale_fix_on_save = 1
+let g:ale_linters = { 
+\'javascript': ['flow', 'eslint'],
+\}
+let g:ale_fixers = { 'javascript': ['prettier'] }
 
 " Set spellfile to location that is guaranteed to exist, can be symlinked to
 " Dropbox or kept in Git and managed outside of thoughtbot/dotfiles using rcm.
@@ -167,7 +175,7 @@ set spellfile=$HOME/.vim-spell-en.utf-8.add
 set complete+=kspell
 
 " Always use vertical diffs
-set diffopt+=vertical
+" set diffopt+=vertical
 
 " ▲ ---- from thoughtbot/dotfiles
 " ▼ ---- personal config
@@ -220,17 +228,20 @@ set hidden
 if has('nvim')
   tnoremap <Esc> <C-\><C-n>
   let g:LanguageClient_serverCommands = {
-  \ 'reason': ['ocaml-language-server', '--stdio'],
+  \ 'rust': ['~/.cargo/bin/rustup', 'run', 'stable', 'rls'],
+  \ 'reason': ['~/bin/reason-language-server'],
   \ 'ocaml': ['ocaml-language-server', '--stdio'],
-  \ 'javascript': ['flow-language-server', '--stdio'],
-  \ 'javascript.jsx': ['flow-language-server', '--stdio'],
+  \ 'javascript': ['flow', 'lsp', '--from', './node_modules/.bin'],
+  \ 'javascript.jsx': ['flow', 'lsp', '--from', './node_modules/.bin'],
+  \ 'purescript': ['purescript-language-server', '--stdio', '--config', '{}']
   \}
   let g:LanguageClient_selectionUI = "fzf"
   let g:LanguageClient_diagnosticsList = "Location"
   let g:LanguageClient_loggingLevel = 'DEBUG'
+  let g:LanguageClient_rootMarkers = ['.flowconfig']
 
-  " nnoremap <silent> gd :call LanguageClient_textDocument_definition()<cr>
-  " nnoremap <silent> gf :call LanguageClient_textDocument_formatting()<cr>
+  nnoremap <silent> gd :call LanguageClient_textDocument_definition()<cr>
+  nnoremap <silent> gp :call LanguageClient_textDocument_formatting()<cr>
   nnoremap <silent> <cr> :call LanguageClient_textDocument_hover()<cr>
 endif
 
@@ -256,3 +267,10 @@ function! ToggleFocusMode()
   endif
 endfunc
 nnoremap <F1> :call ToggleFocusMode()<cr>
+
+let g:sexp_enable_insert_mode_mappings = 0
+let g:vimwiki_list = [{'path': '~/projects/_life',
+                      \ 'syntax': 'markdown', 'ext': '.md'}]
+
+autocmd BufNew,BufEnter *.md execute "silent! CocDisable"
+autocmd BufLeave *.md execute "silent! CocEnable"

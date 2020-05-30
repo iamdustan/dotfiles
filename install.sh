@@ -41,9 +41,19 @@ install_homebrew() {
   if ! cmd_exists "brew"
   then
     /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-    print_success "cargo installed"
+    print_success "homebrew installed"
   else
-    print_success "cargo already installed"
+    print_success "homebrew already installed"
+  fi
+}
+
+install_watchman() {
+  if ! cmd_exists "watchman"
+  then
+    brew install watchman
+    print_success "watchman installed"
+  else
+    print_success "watchman already installed"
   fi
 }
 
@@ -166,6 +176,7 @@ install_ag() {
 print_info "Installing base developer applications"
 
 install_homebrew
+install_watchman
 install_nvm
 install_rustup
 install_neovim
