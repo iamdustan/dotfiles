@@ -40,7 +40,7 @@ setup_nvim() {
   # configuring normal vim, then symlinking
   if [ ! -f $HOME/.vim/autoload/plug.vim ]
   then
-    curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs \
+    curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
           https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
   fi
   vim +PlugInstall +qall
@@ -54,12 +54,14 @@ setup_nvim() {
 setup_osx() {
   # support closing Finder
   defaults write com.apple.finder QuitMenuItem -bool YES
+  print_success "osx defaults configured"
 }
 
 main() {
   print_info "Configuring apps"
 
   setup_nvim
+  setup_osx
 
   print_info "  Finished configuring apps"
 }

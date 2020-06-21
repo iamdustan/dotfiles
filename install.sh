@@ -63,8 +63,22 @@ install_nvm() {
     if [ ! -d "$HOME/.nvm" ]
     then
       curl -o- https://raw.githubusercontent.com/creationix/nvm/v1.33.0/install.sh | bash
+      print_success "nvm installed"
     else
       print_success "nvm already installed"
+    fi
+  fi
+}
+
+install_fnm() {
+  if ! cmd_exists "fnm"
+  then
+    if [ ! -d "$HOME/.fnm" ]
+    then
+      brew install Schniz/tap/fnm
+      print_success "fnm installed"
+    else
+      print_success "fnm already installed"
     fi
   fi
 }
@@ -125,6 +139,17 @@ install_rustup() {
   fi
 }
 
+install_alacritty() {
+  # if ! cmd_exists "cargo"
+  # then
+    brew cask install alacritty
+    sudo tic -xe alacritty,alacritty-direct extra/alacritty.info
+    print_success "alacritty installed"
+  # else
+  #  print_success "alacritty already installed"
+  # fi
+}
+
 install_neovim() {
   if ! cmd_exists "nvim"
   then
@@ -177,8 +202,10 @@ print_info "Installing base developer applications"
 
 install_homebrew
 install_watchman
-install_nvm
+# install_nvm
+install_fnm
 install_rustup
+install_alacritty
 install_neovim
 install_hub
 install_tmux

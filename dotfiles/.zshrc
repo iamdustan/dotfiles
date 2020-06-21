@@ -91,5 +91,4 @@ source $HOME/.cargo/env
 # ocaml
 eval `opam config env`
 
-
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
