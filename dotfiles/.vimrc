@@ -225,25 +225,49 @@ let g:airline_powerline_fonts = 1
 " }
 
 set hidden
-if has('nvim')
-  tnoremap <Esc> <C-\><C-n>
-  let g:LanguageClient_serverCommands = {
-  \ 'rust': ['~/.cargo/bin/rustup', 'run', 'stable', 'rls'],
-  \ 'reason': ['~/bin/reason-language-server'],
-  \ 'ocaml': ['ocaml-language-server', '--stdio'],
-  \ 'javascript': ['flow', 'lsp', '--from', './node_modules/.bin'],
-  \ 'javascript.jsx': ['flow', 'lsp', '--from', './node_modules/.bin'],
-  \ 'purescript': ['purescript-language-server', '--stdio', '--config', '{}']
-  \}
-  let g:LanguageClient_selectionUI = "fzf"
-  let g:LanguageClient_diagnosticsList = "Location"
-  let g:LanguageClient_loggingLevel = 'DEBUG'
-  let g:LanguageClient_rootMarkers = ['.flowconfig']
+" if has('nvim')
+"  tnoremap <Esc> <C-\><C-n>
+"  let g:LanguageClient_serverCommands = {
+"  \ 'rust': ['~/.cargo/bin/rustup', 'run', 'stable', 'rls'],
+"  \ 'reason': ['~/bin/reason-language-server'],
+"  \ 'ocaml': ['ocaml-language-server', '--stdio'],
+"  \ 'javascript': ['flow', 'lsp', '--from', './node_modules/.bin'],
+"  \ 'javascript.jsx': ['flow', 'lsp', '--from', './node_modules/.bin'],
+"  \ 'purescript': ['purescript-language-server', '--stdio', '--config', '{}']
+"  \}
+"  " \ 'typescript': ['typescript-language-server', '--stdio']
+"  let g:LanguageClient_selectionUI = "fzf"
+"  let g:LanguageClient_diagnosticsList = "Location"
+"  let g:LanguageClient_loggingLevel = 'DEBUG'
+"  let g:LanguageClient_rootMarkers = {
+"    \ 'javascript': ['.flowconfig'],
+"    \ 'typescript': ['tsconfig.json'],
+"  }
+"
+"  nnoremap <silent> gd :call LanguageClient_textDocument_definition()<cr>
+"  nnoremap <silent> gp :call LanguageClient_textDocument_formatting()<cr>
+"  nnoremap <silent> <cr> :call LanguageClient_textDocument_hover()<cr>
+" endif
 
-  nnoremap <silent> gd :call LanguageClient_textDocument_definition()<cr>
-  nnoremap <silent> gp :call LanguageClient_textDocument_formatting()<cr>
-  nnoremap <silent> <cr> :call LanguageClient_textDocument_hover()<cr>
-endif
+
+" ======= coc settings
+set updatetime=300
+set shortmess+=c
+" Use K to show documentation in preview window.
+nnoremap <silent> K :call <SID>show_documentation()<CR>
+
+function! s:show_documentation()
+  if (index(['vim','help'], &filetype) >= 0)
+    execute 'h '.expand('<cword>')
+  else
+    call CocAction('doHover')
+  endif
+endfunction
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> <cr> <Plug>(coc-type-definition)
+nmap <silent> gy <Plug>(coc-type-definition)
+nmap <silent> gi <Plug>(coc-implementation)
+nmap <silent> gr <Plug>(coc-references)
 
 command! -bang -nargs=* Find call fzf#vim#grep('rg --column --line-number --no-heading --fixed-strings --ignore-case --no-ignore --hidden --follow --glob "!.git/*" --color "always" '.shellescape(<q-args>), 1, <bang>0)
 set grepprg=rg\ --vimgrep

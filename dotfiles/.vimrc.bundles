@@ -53,4 +53,7 @@ Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 Plug 'rust-lang/rust.vim'
 Plug 'racer-rust/vim-racer'
 
+" The Purescript
+Plug 'purescript-contrib/purescript-vim'
+
 call plug#end()
