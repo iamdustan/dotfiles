@@ -46,7 +46,6 @@ setup_nvim() {
   vim +PlugInstall +qall
   mkdir ~/.config  > /dev/null 2>&1
   mkdir ~/.config/nvim  > /dev/null 2>&1
-  ln -s ~/.vim ~/.config/nvim  > /dev/null 2>&1
   ln -s ~/.vimrc ~/.config/nvim/init.vim  > /dev/null 2>&1
   print_success "nvim configured"
 }
@@ -57,11 +56,19 @@ setup_osx() {
   print_success "osx defaults configured"
 }
 
+setup_alacritty() {
+  mkdir ~/.config > /dev/null 2>&1
+  mkdir ~/.config/alacritty > /dev/null 2>&1
+  ln -fs $(pwd)/config/alacritty.yml ~/.config/alacritty/alacritty.yml
+  print_success "alacritty configured"
+}
+
 main() {
   print_info "Configuring apps"
 
   setup_nvim
   setup_osx
+  setup_alacritty
 
   print_info "  Finished configuring apps"
 }
