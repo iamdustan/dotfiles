@@ -37,6 +37,12 @@ cmd_exists() {
         || return 1
 }
 
+file_exists() {
+    [ -d $1 ] \
+        && return 0 \
+        || return 1
+}
+
 install_homebrew() {
   if ! cmd_exists "brew"
   then
@@ -60,7 +66,7 @@ install_watchman() {
 install_nvm() {
   if ! cmd_exists "nvm"
   then
-    if [ ! -d "$HOME/.nvm" ]
+    if file_exists "$HOME/.nvm"
     then
       curl -o- https://raw.githubusercontent.com/creationix/nvm/v1.33.0/install.sh | bash
       print_success "nvm installed"
@@ -73,7 +79,7 @@ install_nvm() {
 install_fnm() {
   if ! cmd_exists "fnm"
   then
-    if [ ! -d "$HOME/.fnm" ]
+    if file_exists "$HOME/.fnm"
     then
       brew install Schniz/tap/fnm
       print_success "fnm installed"
@@ -140,14 +146,14 @@ install_rustup() {
 }
 
 install_alacritty() {
-  # if ! cmd_exists "cargo"
-  # then
+  if ! brew cask info alacritty &>/dev/null;
+  then
     brew cask install alacritty
     sudo tic -xe alacritty,alacritty-direct extra/alacritty.info
     print_success "alacritty installed"
-  # else
-  #  print_success "alacritty already installed"
-  # fi
+  else
+    print_success "alacritty already installed"
+  fi
 }
 
 install_neovim() {
@@ -179,7 +185,7 @@ install_tmux() {
 }
 
 install_zsh() {
-  if [ ! -d $HOME/.zsh ]
+  if file_exists $HOME/.zshrc
   then
     sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
     print_success "zsh installed"
@@ -198,6 +204,21 @@ install_ag() {
   fi
 }
 
+install_amethyst() {
+  if ! brew cask info amethyst &>/dev/null;
+  then
+    brew cask install amethyst
+    print_success "amethyst installed"
+  else
+    print_success "amethyst already installed"
+  fi
+}
+
+upgrade_casks() {
+    print_info "upgrading casks"
+    brew cask upgrade
+}
+
 print_info "Installing base developer applications"
 
 install_homebrew
@@ -213,6 +234,8 @@ install_zsh
 install_ag
 install_node
 install_ocaml
+install_amethyst
+upgrade_casks
 
 print_info "  Finished installing base applications"
 
