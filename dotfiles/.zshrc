@@ -83,7 +83,7 @@ export PATH="node_modules/.bin:$PATH"
 # [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
 
 # fnm
-eval "$(fnm env --multi)"
+eval "$(fnm env)"
 
 # cargo
 source $HOME/.cargo/env

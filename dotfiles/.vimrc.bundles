@@ -43,7 +43,7 @@ Plug 'chriskempson/tomorrow-theme'
 " The JS
 Plug 'prettier/vim-prettier', {
   \ 'do': 'yarn install',
-  \ 'for': ['javascript', 'json', 'graphql', 'markdown'] }
+  \ 'for': ['javascript', 'typescript', 'json', 'graphql', 'markdown'] }
 
 " The Ocaml
 Plug 'reasonml-editor/vim-reason-plus'

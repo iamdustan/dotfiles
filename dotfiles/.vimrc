@@ -296,5 +296,6 @@ let g:sexp_enable_insert_mode_mappings = 0
 let g:vimwiki_list = [{'path': '~/projects/_life',
                       \ 'syntax': 'markdown', 'ext': '.md'}]
 
+command! -nargs=0 Prettier :CocCommand prettier.formatFile
 autocmd BufNew,BufEnter *.md execute "silent! CocDisable"
 autocmd BufLeave *.md execute "silent! CocEnable"
