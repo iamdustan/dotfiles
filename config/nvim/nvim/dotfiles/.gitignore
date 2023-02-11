@@ -1,0 +1,13 @@
+*~
+\#*\#
+.DS_Store
+*.sw[nop]
+.bundle
+.env
+*.bak
+*.temp
+db/*.sqlite3
+log/*.log
+tags
+tmp
+
