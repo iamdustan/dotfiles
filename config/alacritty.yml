@@ -13,6 +13,9 @@ env:
   TERM: xterm-256color
 
 window:
+  # Background opacity
+  opacity: 1.0
+
   # Allow terminal applications to change Alacritty's window title.
   dynamic_title: true
 
@@ -84,7 +87,7 @@ font:
   # OS X only: use thin stroke font rendering. Thin strokes are suitable
   # for retina displays, but for non-retina you probably want this set to
   # false.
-  use_thin_strokes: true
+  # use_thin_strokes: true
 
 # Colors (Tomorrow Night Bright)
 colors:
@@ -116,7 +119,7 @@ colors:
     green:   '0x9ec400'
     yellow:  '0xe7c547'
     blue:    '0x7aa6da'
-    magenta: '0xb77ee0'
+    magenta: '0xb77ee1'
     cyan:    '0x54ced6'
     white:   '0xffffff'
 
@@ -159,9 +162,6 @@ bell:
   duration: 0
   color: '0xffffff'
 
-# Background opacity
-background_opacity: 1.0
-
 # Mouse bindings
 #
 # Currently doesn't support modifiers. Both the `mouse` and `action` fields must
@@ -184,7 +184,7 @@ mouse:
   double_click: { threshold: 300 }
   triple_click: { threshold: 300 }
   hide_cursor_when_typing: false
-  url:
+  hints:
     # URL launcher
     #
     # This program is executed when clicking on a text which is recognized as a URL.
