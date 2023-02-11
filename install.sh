@@ -225,8 +225,10 @@ install_homebrew
 install_watchman
 # install_nvm
 install_fnm
+install_fzf
 install_rustup
-install_alacritty
+# I prefer building alacritty from source...
+# install_alacritty
 install_neovim
 install_hub
 install_tmux

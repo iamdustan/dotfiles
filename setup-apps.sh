@@ -58,8 +58,8 @@ setup_osx() {
 
 setup_alacritty() {
   mkdir ~/.config > /dev/null 2>&1
-  mkdir ~/.config/alacritty > /dev/null 2>&1
-  ln -fs $(pwd)/config/alacritty.yml ~/.config/alacritty/alacritty.yml
+  # mkdir ~/.config/alacritty > /dev/null 2>&1
+  ln -fs $(pwd)/config/alacritty ~/.config/alacritty
   print_success "alacritty configured"
 }
 
