@@ -145,6 +145,8 @@ install_rustup() {
   fi
 }
 
+# OpenGL terminal emulator
+# https://github.com/alacritty/alacritty
 install_alacritty() {
   if ! brew cask info alacritty &>/dev/null;
   then
@@ -156,6 +158,8 @@ install_alacritty() {
   fi
 }
 
+# vim for the modern era
+# https://neovim.io/
 install_neovim() {
   if ! cmd_exists "nvim"
   then
@@ -166,6 +170,8 @@ install_neovim() {
   fi
 }
 
+# github maintained git util library
+# https://github.com/github/hub
 install_hub() {
   if ! cmd_exists "hub"
   then
@@ -174,6 +180,8 @@ install_hub() {
   fi
 }
 
+# terminal multiplexer
+# https://github.com/tmux/tmux/wiki
 install_tmux() {
   if ! cmd_exists "tmux"
   then
@@ -184,6 +192,8 @@ install_tmux() {
   fi
 }
 
+# zsh / ohmyzsh is an interactive shell
+# https://ohmyz.sh/
 install_zsh() {
   if file_exists $HOME/.zshrc
   then
@@ -191,6 +201,18 @@ install_zsh() {
     print_success "zsh installed"
   else
     print_success "zsh already installed"
+  fi
+}
+
+# fzf is a general-purpose command-line fuzzy finder.
+# https://github.com/junegunn/fzf
+install_fzf() {
+  if ! cmd_exists "fzf"
+  then
+    brew install fzf
+    print_success "fzf (ag) installed"
+  else
+    print_success "fzf (ag) already installed"
   fi
 }
 
@@ -205,12 +227,23 @@ install_ag() {
 }
 
 install_amethyst() {
-  if ! brew cask info amethyst &>/dev/null;
+  if ! brew info amethyst &>/dev/null;
   then
-    brew cask install amethyst
+    brew install amethyst
     print_success "amethyst installed"
   else
     print_success "amethyst already installed"
+  fi
+}
+
+install_lazygit() {
+  if ! brew info lazygit &>/dev/null;
+  then
+    brew install jesseduffield/lazygit/lazygit
+    brew install lazygit
+    print_success "lazygit installed"
+  else
+    print_success "lazygit already installed"
   fi
 }
 
@@ -237,7 +270,8 @@ install_ag
 install_node
 install_ocaml
 install_amethyst
-upgrade_casks
+install_lazygit
+# upgrade_casks
 
 print_info "  Finished installing base applications"
 
