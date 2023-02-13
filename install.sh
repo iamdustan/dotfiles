@@ -226,6 +226,18 @@ install_ag() {
   fi
 }
 
+# A simple, fast and user-friendly alternative to 'find' 
+# https://github.com/sharkdp/fd
+install_fd() {
+  if ! cmd_exists "fd"
+  then
+    brew install fd
+    print_success "fd installed"
+  else
+    print_success "fd already installed"
+  fi
+}
+
 install_amethyst() {
   if ! brew info amethyst &>/dev/null;
   then
@@ -259,6 +271,7 @@ install_watchman
 # install_nvm
 install_fnm
 install_fzf
+install_fd
 install_rustup
 # I prefer building alacritty from source...
 # install_alacritty
