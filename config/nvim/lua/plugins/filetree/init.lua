@@ -50,6 +50,21 @@ local M = {
 			view.focus()
 		end
 
+		local function vsplit()
+			-- open as vsplit on current node
+			local action = "vsplit"
+			local node = lib.get_node_at_cursor()
+
+			-- Just copy what's done normally with vsplit
+			if node.link_to and not node.nodes then
+				require("nvim-tree.actions.node.open-file").fn(action, node.link_to)
+			elseif node.nodes ~= nil then
+				lib.expand_or_collapse(node)
+			else
+				require("nvim-tree.actions.node.open-file").fn(action, node.absolute_path)
+			end
+		end
+
 		local config = {
 			view = {
 				mappings = {
@@ -57,15 +72,16 @@ local M = {
 					list = {
 						{ key = "l", action = "edit", action_cb = edit_or_open },
 						{ key = "L", action = "vsplit_preview", action_cb = vsplit_preview },
+						{ key = "S", action = "vsplit", action_cb = vsplit },
 						{ key = "h", action = "close_node" },
 						{ key = "H", action = "collapse_all", action_cb = collapse_all },
 					},
 				},
 			},
 			actions = {
-				open_file = {
-					quit_on_open = false,
-				},
+				-- open_file = {
+				-- quit_on_open = false,
+				-- },
 			},
 		}
 		require("nvim-tree").setup(config)

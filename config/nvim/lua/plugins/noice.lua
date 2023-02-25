@@ -1,7 +1,7 @@
 local M = {
 	"folke/noice.nvim",
 	event = "VeryLazy",
-	enabled = true, -- disable for now
+	enabled = false, -- disable for now
 }
 
 function M.config()
