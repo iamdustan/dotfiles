@@ -13,7 +13,7 @@ return {
 			-- NERDTree open bindings
 			-- { "<leader>n", "<cmd>Telescope file_browser<cr><esc>", },
 			-- Ctrl-p ftw
-			{ "<C-p>", "<cmd>Telescope find_files<cr>", desc = "Grep" },
+			{ "<C-p>", "<cmd>Telescope find_files<cr>", desc = "Find files" },
 		},
 		dependencies = {
 			"nvim-telescope/telescope-file-browser.nvim",

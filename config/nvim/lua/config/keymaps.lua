@@ -47,3 +47,9 @@ keymap("n", "<S-Right>", "<cmd>vertical resize +2<CR>")
 keymap("n", "<C-S>", ":w<CR>", { silent = true, noremap = true })
 keymap("i", "<c-s>", "<c-o>:w<CR>", { noremap = true })
 keymap("v", "<C-s>", "<esc>:w<CR>gv", { noremap = true })
+
+-- Quickfix
+keymap("n", "]q", "<cmd>cnext<CR>", { noremap = true })
+keymap("i", "]q", "<c-o>:cnext<CR>", { noremap = true })
+keymap("n", "[q", "<cmd>cprevious<CR>", { noremap = true })
+keymap("i", "[q", "<c-o>:cprevious<CR>", { noremap = true })
