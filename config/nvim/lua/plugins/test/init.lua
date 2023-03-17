@@ -23,6 +23,7 @@ return {
 				"<cmd>lua require('neotest').run.run({vim.fn.expand('%'), strategy = 'dap'})<cr>",
 				desc = "Debug File",
 			},
+			{ "<leader>tN", "", desc = "+Nearest" },
 			{ "<leader>tNL", "<cmd>lua require('neotest').run.run_last({strategy = 'dap'})<cr>", desc = "Debug Last" },
 			{ "<leader>tNa", "<cmd>lua require('neotest').run.attach()<cr>", desc = "Attach" },
 			{ "<leader>tNf", "<cmd>lua require('neotest').run.run(vim.fn.expand('%'))<cr>", desc = "File" },
@@ -69,9 +70,12 @@ return {
 			require("neotest").setup(opts)
 		end,
 	},
+
+	--  A task runner and job management plugin for Neovim
 	{
 		"stevearc/overseer.nvim",
 		keys = {
+			{ "<leader>to", "", desc = "+Overseer (Tasks)" },
 			{ "<leader>toR", "<cmd>OverseerRunCmd<cr>", desc = "Run Command" },
 			{ "<leader>toa", "<cmd>OverseerTaskAction<cr>", desc = "Task Action" },
 			{ "<leader>tob", "<cmd>OverseerBuild<cr>", desc = "Build" },
