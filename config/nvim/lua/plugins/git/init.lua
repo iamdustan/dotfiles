@@ -21,4 +21,7 @@ return {
 			{ "<leader>gg", "<cmd>LazyGit<cr>", desc = "LazyGit" },
 		},
 	},
+	-- :GBrowse
+	{ "tpope/vim-fugitive", event = "VeryLazy" },
+	{ "tpope/vim-rhubarb", event = "VeryLazy" },
 }
