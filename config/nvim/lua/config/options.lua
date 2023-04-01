@@ -44,5 +44,4 @@ vim.opt.laststatus = 2 -- always display the status line
 
 vim.g.mapleader = " "
 vim.g.maplocalleader = ","
-vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
-
+vim.keymap.set({ "n", "v" }, "<Space>", "<Nop>", { silent = true })
