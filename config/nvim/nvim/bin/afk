@@ -1,5 +1,0 @@
-#!/bin/sh
-#
-# Go afk on OSX 10.13 (High Sierra)
-
-osascript -e 'tell application "System Events" to keystroke "q" using {command down, control down}'

@@ -1,6 +1,0 @@
-#!/bin/sh
-#
-# Go afk on OSX 10.13 (High Sierra)
-
-/Applications/MIT:GNU\ Scheme\ 10.1.5.app/Contents/Resources/mit-scheme
-

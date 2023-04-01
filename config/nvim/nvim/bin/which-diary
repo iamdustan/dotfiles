@@ -1,7 +1,0 @@
-#!/bin/bash
-
-FILE=~/diary/"$(date +%F).md"
-
-touch "$FILE"
-
-$EDITOR "$FILE"
