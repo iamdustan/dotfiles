@@ -61,8 +61,15 @@ return {
 			local nls = require("null-ls")
 			nls.setup({
 				sources = {
+					-- lua
 					nls.builtins.formatting.stylua,
+
+					-- javascript
 					nls.builtins.formatting.prettier,
+					nls.builtins.diagnostics.eslint_d,
+
+					-- cljoure
+					nls.builtins.formatting.cljstyle,
 				},
 			})
 		end,
