@@ -222,6 +222,16 @@ install_ag() {
   fi
 }
 
+install_ripgrep() {
+  if ! cmd_exists "rg"
+  then
+    brew install  ripgrep
+    print_success "ripgrep (rg) installed"
+  else
+    print_success "ripgrep (rg) already installed"
+  fi
+}
+
 # A simple, fast and user-friendly alternative to 'find' 
 # https://github.com/sharkdp/fd
 install_fd() {
@@ -275,7 +285,8 @@ install_neovim
 install_hub
 install_tmux
 install_zsh
-install_ag
+# install_ag
+install_ripgrep
 install_node
 install_ocaml
 install_amethyst
