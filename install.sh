@@ -193,7 +193,7 @@ install_tmux() {
 install_zsh() {
   if file_exists $HOME/.zshrc
   then
-    sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
     print_success "zsh installed"
   else
     print_success "zsh already installed"
@@ -274,6 +274,7 @@ print_info "Installing base developer applications"
 
 install_homebrew
 install_watchman
+# fnm > nvm
 # install_nvm
 install_fnm
 install_fzf
@@ -293,5 +294,7 @@ install_amethyst
 install_lazygit
 # upgrade_casks
 
+print_info "Remember to build alacritty from source"
+print_info "  git clone git@github.com:alacritty/alacritty.git && cd alacritty && make app"
 print_info "  Finished installing base applications"
 

@@ -53,6 +53,8 @@ setup_nvim() {
 setup_osx() {
   # support closing Finder
   defaults write com.apple.finder QuitMenuItem -bool YES
+  # clear out the Dock
+  defaults write com.apple.dock persistent-apps -array
   print_success "osx defaults configured"
 }
 
