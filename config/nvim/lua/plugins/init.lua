@@ -23,7 +23,7 @@ return {
 		"rcarriga/nvim-notify",
 		event = "VeryLazy",
 		enabled = true,
-		config = { default = true }, -- same as config = true
+		config = { default = true },
 	},
 	{
 		"monaqa/dial.nvim",

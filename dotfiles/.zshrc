@@ -92,3 +92,11 @@ source $HOME/.cargo/env
 eval `opam config env`
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+# pnpm
+export PNPM_HOME="/Users/iamdustan/Library/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+# pnpm end

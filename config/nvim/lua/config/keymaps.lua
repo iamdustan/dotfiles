@@ -50,6 +50,6 @@ keymap("v", "<C-s>", "<esc>:w<CR>gv", { noremap = true })
 
 -- Quickfix
 keymap("n", "]q", "<cmd>cnext<CR>", { noremap = true })
-keymap("i", "]q", "<c-o>:cnext<CR>", { noremap = true })
 keymap("n", "[q", "<cmd>cprevious<CR>", { noremap = true })
-keymap("i", "[q", "<c-o>:cprevious<CR>", { noremap = true })
+-- keymap("i", "]q", "<c-o>:cnext<CR>", { noremap = true })
+-- keymap("i", "[q", "<c-o>:cprevious<CR>", { noremap = true })

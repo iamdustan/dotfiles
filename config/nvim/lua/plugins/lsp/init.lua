@@ -8,7 +8,7 @@ return {
 			--  💻 Neovim setup for init.lua and plugin development with full signature help, docs and completion for the nvim lua API.
 			{ "folke/neodev.nvim", config = true },
 			-- Standalone UI for nvim-lsp progress. Eye candy for the impatient
-			{ "j-hui/fidget.nvim", config = true },
+			{ "j-hui/fidget.nvim", tag = "legacy", event = "LspAttach", config = true },
 			-- Incremental LSP renaming based on Neovim's command-preview feature.
 			{ "smjonas/inc-rename.nvim", config = true },
 
