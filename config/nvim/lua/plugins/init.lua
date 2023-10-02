@@ -11,7 +11,9 @@ return {
 	{
 		"lukas-reineke/indent-blankline.nvim",
 		event = "BufReadPre",
+		main = "ibl",
 		config = true,
+		opts = {},
 	},
 	--  Neovim plugin to improve the default vim.ui interfaces
 	{
