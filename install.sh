@@ -265,6 +265,17 @@ install_lazygit() {
   fi
 }
 
+install_fonts() {
+  brew tap homebrew/cask-fonts
+  brew install font-caskaydia-cove-nerd-font
+  brew install font-caskaydia-mono-nerd-font
+  print_success "fonts installed installed"
+  
+  # else
+    # print_success "lazygit already installed"
+  # fi
+}
+
 upgrade_casks() {
     print_info "upgrading casks"
     brew cask upgrade
@@ -292,6 +303,7 @@ install_node
 install_ocaml
 install_amethyst
 install_lazygit
+install_fonts
 # upgrade_casks
 
 print_info "Remember to build alacritty from source"
