@@ -34,20 +34,17 @@ print_success() {
 
 
 # setup vim/neovim
-# Plug
 setup_nvim() {
-  # this is a bit of a hack. It’s still taking a vim-first approach and
-  # configuring normal vim, then symlinking
-  # if [ ! -f $HOME/.vim/autoload/plug.vim ]
-  # then
-  #   curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
-  #         https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-  # fi
-  # vim +PlugInstall +qall
   mkdir ~/.config  > /dev/null 2>&1
   ln -fs $(pwd)/config/nvim ~/.config/nvim
   # ln -s ~/.vimrc ~/.config/nvim/init.vim  > /dev/null 2>&1
   print_success "nvim configured"
+}
+# setup zsh
+setup_zsh() {
+  # install gh cli completion
+  gh completion -s zsh > ~/.zsh/completion/_gh
+  print_success "zsh configured with completions: gh"
 }
 
 setup_osx() {

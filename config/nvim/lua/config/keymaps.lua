@@ -10,8 +10,8 @@ keymap("n", "g,", "g,zvzz")
 keymap("n", "g;", "g;zvzz")
 
 -- Better escape using jk in insert and terminal mode
-keymap("i", "jk", "<ESC>")
-keymap("t", "jk", "<C-\\><C-n>")
+-- keymap("i", "jk", "<ESC>")
+-- keymap("t", "jk", "<C-\\><C-n>")
 keymap("t", "<C-h>", "<C-\\><C-n><C-w>h")
 keymap("t", "<C-j>", "<C-\\><C-n><C-w>j")
 keymap("t", "<C-k>", "<C-\\><C-n><C-w>k")

@@ -39,7 +39,7 @@ return {
 			vim.api.nvim_set_keymap("v", "g<C-x>", require("dial.map").dec_gvisual(), { noremap = true })
 		end,
 	},
-	--  Smooth scrolling
+	--  Stuff
 	{
 		"karb94/neoscroll.nvim",
 		event = "VeryLazy",

@@ -30,6 +30,7 @@ local servers = {
 		disable_formatting = true,
 		formatting = false,
 	},
+	bashls = {},
 	dockerls = {},
 }
 

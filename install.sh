@@ -131,6 +131,16 @@ install_ocaml() {
   fi
 }
 
+install_gh() {
+  if ! cmd_exists "gh"
+  then
+    brew install gh
+    print_success "gh installed"
+  else
+    print_success "gh already installed"
+  fi
+}
+
 install_rustup() {
   if ! cmd_exists "cargo"
   then
@@ -302,6 +312,7 @@ install_ripgrep
 install_node
 install_ocaml
 install_amethyst
+install_gh
 install_lazygit
 install_fonts
 # upgrade_casks
