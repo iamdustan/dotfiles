@@ -239,3 +239,4 @@ schemes:
 
 # Apply the color scheme.
 colors: *tokyo-night
+# The definition of color schemes.

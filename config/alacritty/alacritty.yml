@@ -357,3 +357,4 @@ key_bindings:
 
 import:
   - ~/.config/alacritty/themes.yml
+
