@@ -3,7 +3,7 @@ return {
 	"MunifTanjim/nui.nvim",
 	{
 		"nvim-tree/nvim-web-devicons",
-		config = { default = true },
+		opts = { default = true },
 	},
 	-- numb.nvim is a Neovim plugin that peeks lines of the buffer in non-obtrusive way.
 	-- :{number} does line previews
@@ -25,7 +25,7 @@ return {
 		"rcarriga/nvim-notify",
 		event = "VeryLazy",
 		enabled = true,
-		config = { default = true },
+		opts = { default = true },
 	},
 	{
 		"monaqa/dial.nvim",

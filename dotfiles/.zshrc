@@ -9,9 +9,9 @@ ZSH_THEME="theunraveler"
 
 EDITOR="nvim"
 
-plugins=(git yarn docker)
-
 source $ZSH/oh-my-zsh.sh
+plugins+=(git yarn nx-completion)
+
 
 bindkey -v
 bindkey "^F" vi-cmd-mode

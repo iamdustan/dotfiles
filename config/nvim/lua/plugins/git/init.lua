@@ -7,7 +7,7 @@ return {
 	{
 		"TimUntersberger/neogit",
 		cmd = "Neogit",
-		config = {
+		opts = {
 			integrations = { diffview = true },
 		},
 		keys = {
