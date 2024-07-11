@@ -12,8 +12,9 @@ return {
 			-- Incremental LSP renaming based on Neovim's command-preview feature.
 			{ "smjonas/inc-rename.nvim", config = true },
 
+			-- TODO: delete after confirming rusaceonvim is working well
 			--  Tools for better development in rust using neovim's builtin lsp
-			"simrat39/rust-tools.nvim",
+			-- "simrat39/rust-tools.nvim",
 			"rust-lang/rust.vim",
 
 			--  Easily install and manage LSP servers, DAP servers, linters, and formatters.
@@ -66,9 +67,10 @@ return {
 
 					-- javascript
 					nls.builtins.formatting.prettier,
-					-- nls.builtins.diagnostics.eslint_d,
+					-- nls.builtins.formatting.eslint,
+					nls.builtins.diagnostics.eslint_d,
 
-					-- cljoure
+					-- clojure
 					nls.builtins.formatting.cljstyle,
 				},
 			})

@@ -56,6 +56,7 @@ function M.setup(_)
 	end)
 
 	require("mason-lspconfig").setup({ ensure_installed = vim.tbl_keys(servers) })
+	--[[ TODO; delete after confirming rustaceanvim is working
 	require("mason-lspconfig").setup_handlers({
 		function(server)
 			local opts = servers[server] or {}
@@ -69,6 +70,8 @@ function M.setup(_)
 			rt.setup({ server = opts })
 		end,
 	})
+  ]]
+	--
 end
 
 return M

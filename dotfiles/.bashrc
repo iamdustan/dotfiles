@@ -1,4 +1,3 @@
-
 export NODE_ENV='development'
 export LS_OPTIONS='--color=auto'
 eval "`dircolors`"
@@ -29,5 +28,5 @@ export EDITOR=nvim
 # --glob: Additional conditions for search (in this case ignore everything in the .git/ folder)
 export FZF_DEFAULT_COMMAND='rg --files --no-ignore --hidden --follow --glob "!.git/*"'
 
-
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
+. "$HOME/.cargo/env"
