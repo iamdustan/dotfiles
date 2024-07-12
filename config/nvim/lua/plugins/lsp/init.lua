@@ -15,7 +15,7 @@ return {
 			-- TODO: delete after confirming rusaceonvim is working well
 			--  Tools for better development in rust using neovim's builtin lsp
 			-- "simrat39/rust-tools.nvim",
-			"rust-lang/rust.vim",
+			-- "rust-lang/rust.vim",
 
 			--  Easily install and manage LSP servers, DAP servers, linters, and formatters.
 			"williamboman/mason.nvim",
@@ -57,7 +57,7 @@ return {
 	{
 		"nvimtools/none-ls.nvim",
 		event = "BufReadPre",
-		dependencies = { "mason.nvim" },
+		dependencies = { "mason.nvim", "nvimtools/none-ls-extras.nvim" },
 		config = function()
 			local nls = require("null-ls")
 			nls.setup({
@@ -67,11 +67,10 @@ return {
 
 					-- javascript
 					nls.builtins.formatting.prettier,
-					-- nls.builtins.formatting.eslint,
-					nls.builtins.diagnostics.eslint_d,
+					require("none-ls.diagnostics.eslint_d"),
 
 					-- clojure
-					nls.builtins.formatting.cljstyle,
+					-- nls.builtins.formatting.cljstyle,
 				},
 			})
 		end,
@@ -88,4 +87,6 @@ return {
 		},
 		config = true,
 	},
+
+	{ import = "plugins.extras.lang" },
 }

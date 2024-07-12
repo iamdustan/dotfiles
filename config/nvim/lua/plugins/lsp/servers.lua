@@ -1,6 +1,7 @@
 local M = {}
 
 local servers = {
+	--[[
 	rust_analyzer = {
 		settings = {
 			["rust-analyzer"] = {
@@ -12,6 +13,8 @@ local servers = {
 			},
 		},
 	},
+  ]]
+	--
 	lua_ls = {
 		settings = {
 			Lua = {
@@ -56,22 +59,6 @@ function M.setup(_)
 	end)
 
 	require("mason-lspconfig").setup({ ensure_installed = vim.tbl_keys(servers) })
-	--[[ TODO; delete after confirming rustaceanvim is working
-	require("mason-lspconfig").setup_handlers({
-		function(server)
-			local opts = servers[server] or {}
-			opts.capabilities = lsp_capabilities()
-			require("lspconfig")[server].setup(opts)
-		end,
-		["rust_analyzer"] = function(server)
-			local rt = require("rust-tools")
-			local opts = servers[server] or {}
-			opts.capabilities = lsp_capabilities()
-			rt.setup({ server = opts })
-		end,
-	})
-  ]]
-	--
 end
 
 return M
