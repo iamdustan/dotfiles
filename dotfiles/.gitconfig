@@ -1,0 +1,31 @@
+[user]
+  name = Dustan Kasten
+  email = dustan.kasten@gmail.com
+[merge]
+  conflictstyle = diff3
+[alias]
+  checkout-branch = !git branch --sort='-*committerdate' | fzf | xargs git checkout
+  cleanup-branch = !git branch --sort='-*committerdate' | fzf -m | xargs git branch -d
+  sync-branch = !git fetch origin main | git rebase origin/main
+  pf = push --force-with-lease
+  bb = !better-git-branch.sh
+	about = "!describe() { msg=\"$1\"; git config branch.\"$(git rev-parse --abbrev-ref HEAD)\".description ${msg:+\"$msg\"}; }; describe"
+
+[init]
+	defaultBranch = main
+[pull]
+	rebase = true
+[push]
+  autoSetupRemote = true
+[fetch]
+	writeCommitGraph = true
+[core]
+  editor = nvim
+
+# Reuse recorded resolution
+[rerere]
+	enabled = true
+[colum]
+	ui = auto
+[branch]
+	sort = --commiterdate
