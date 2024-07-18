@@ -1,5 +1,6 @@
 return {
 	-- Extend auto completion
+	--[[
 	{
 		"hrsh7th/nvim-cmp",
 		dependencies = {
@@ -12,16 +13,15 @@ return {
 			},
 		},
 		---@param opts cmp.ConfigSchema
-		--[[
+
 		opts = function(_, opts)
 			local cmp = require("cmp")
 			opts.sources = cmp.config.sources(vim.list_extend(opts.sources, {
 				{ name = "crates" },
 			}))
 		end,
-    ]]
-		--
 	},
+    --]]
 
 	-- Add Rust & related to treesitter
 	{
@@ -51,7 +51,7 @@ return {
 				on_attach = function(client, bufnr)
 					-- register which-key mappings
 					local wk = require("which-key")
-					wk.register({
+					wk.add({
 						["<leader>cR"] = {
 							function()
 								vim.cmd.RustLsp("codeAction")
@@ -69,6 +69,8 @@ return {
 				default_settings = {
 					-- rust-analyzer language server configuration
 					["rust-analyzer"] = {
+						check = { command = "clippy" },
+						diagnostics = { enable = true },
 						cargo = {
 							allFeatures = true,
 							loadOutDirsFromCheck = true,
@@ -98,6 +100,8 @@ return {
 	},
 
 	-- Correctly setup lspconfig for Rust 🚀
+	-- TODO: figure out how to extend these rather than overwrite
+	--[[
 	{
 		"neovim/nvim-lspconfig",
 		opts = {

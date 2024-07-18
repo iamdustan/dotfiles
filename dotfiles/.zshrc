@@ -100,3 +100,5 @@ case ":$PATH:" in
   *) export PATH="$PNPM_HOME:$PATH" ;;
 esac
 # pnpm end
+
+export ESLINT_USE_FLAT_CONFIG=true

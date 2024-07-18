@@ -45,3 +45,18 @@ vim.opt.laststatus = 2 -- always display the status line
 vim.g.mapleader = " "
 vim.g.maplocalleader = ","
 vim.keymap.set({ "n", "v" }, "<Space>", "<Nop>", { silent = true })
+
+-- make error diagnositcs only appear in float window when focused with `[d`
+vim.diagnostic.config({
+	underline = true,
+	signs = true,
+	virtual_text = false,
+	float = {
+		show_header = true,
+		source = "if_many",
+		border = "rounded",
+		focusable = false,
+	},
+	update_in_insert = false,
+	severity_sort = false,
+})

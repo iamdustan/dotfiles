@@ -2,19 +2,32 @@ local M = {}
 
 local servers = {
 	--[[
-	rust_analyzer = {
-		settings = {
-			["rust-analyzer"] = {
-				cargo = { allFeatures = true },
-				checkOnSave = {
-					command = "cargo clippy",
-					extraArgs = { "--no-deps" },
-				},
+	-- FIXME copied from plugins/extras/lang/rust.lua
+	["rust-analyzer"] = {
+		check = { command = "clippy" },
+		diagnostics = { enable = true },
+		cargo = {
+			allFeatures = true,
+			loadOutDirsFromCheck = true,
+			runBuildScripts = true,
+		},
+		-- Add clippy lints for Rust.
+		checkOnSave = {
+			allFeatures = true,
+			command = "clippy",
+			extraArgs = { "--no-deps" },
+		},
+		procMacro = {
+			enable = true,
+			ignored = {
+				["async-trait"] = { "async_trait" },
+				["napi-derive"] = { "napi" },
+				["async-recursion"] = { "async_recursion" },
 			},
 		},
 	},
-  ]]
-	--
+  --]]
+
 	lua_ls = {
 		settings = {
 			Lua = {
@@ -59,6 +72,13 @@ function M.setup(_)
 	end)
 
 	require("mason-lspconfig").setup({ ensure_installed = vim.tbl_keys(servers) })
+	require("mason-lspconfig").setup_handlers({
+		function(server)
+			local opts = servers[server] or {}
+			opts.capabilities = lsp_capabilities()
+			require("lspconfig")[server].setup(opts)
+		end,
+	})
 end
 
 return M

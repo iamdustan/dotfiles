@@ -38,6 +38,7 @@ return {
 			"vim-test/vim-test",
 			"nvim-neotest/neotest-plenary",
 			"nvim-neotest/neotest-vim-test",
+			"marilari88/neotest-vitest",
 			"rouge8/neotest-rust",
 			"haydenmeade/neotest-jest",
 		},
@@ -55,6 +56,13 @@ return {
 						env = { CI = true },
 						cwd = function(path)
 							return vim.fn.getcwd()
+						end,
+					}),
+					require("neotest-vitest")({
+						-- filter directories when searching for test files. Useful in large
+						-- projects
+						filter_dir = function(name, rel_path, root)
+							return name ~= "node_modules"
 						end,
 					}),
 				},

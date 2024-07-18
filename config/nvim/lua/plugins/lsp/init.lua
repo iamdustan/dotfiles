@@ -12,11 +12,6 @@ return {
 			-- Incremental LSP renaming based on Neovim's command-preview feature.
 			{ "smjonas/inc-rename.nvim", config = true },
 
-			-- TODO: delete after confirming rusaceonvim is working well
-			--  Tools for better development in rust using neovim's builtin lsp
-			-- "simrat39/rust-tools.nvim",
-			-- "rust-lang/rust.vim",
-
 			--  Easily install and manage LSP servers, DAP servers, linters, and formatters.
 			"williamboman/mason.nvim",
 			-- Extension to mason.nvim that makes it easier to use lspconfig with mason.nvim. Strongly recommended for Windows users.

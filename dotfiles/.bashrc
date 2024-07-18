@@ -30,3 +30,6 @@ export FZF_DEFAULT_COMMAND='rg --files --no-ignore --hidden --follow --glob "!.g
 
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
 . "$HOME/.cargo/env"
+
+# for eslint_d
+export ESLINT_USE_FLAT_CONFIG=true
