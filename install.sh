@@ -9,7 +9,7 @@ print_error() {
 
 print_info() {
     # Print output in purple
-    printf "\n\e[0;35m $1\e[0m\n\n"
+    printf "\e[0;35m $1\e[0m\n"
 }
 
 print_question() {
@@ -92,19 +92,10 @@ install_fnm() {
 install_node() {
   if ! cmd_exists "node"
   then
-    fnm install v18 &>/dev/null
-    print_success "node v18.x.x installed"
+    fnm install v20 &>/dev/null
+    print_success "node v20.x.x installed"
   else
-    print_success "node v18.x.x already installed"
-  fi
-
-  if ! cmd_exists "yarn"
-  then
-    brew install yarn &>/dev/null
-
-    print_success "yarn installed"
-  else
-    print_success "yarn already installed"
+    print_success "node v20.x.x already installed"
   fi
 }
 
@@ -122,13 +113,6 @@ install_ocaml() {
     print_success "opam already installed"
   fi
 
-  if ! cmd_exists "yarn"
-  then
-    brew install yarn &>/dev/null
-
-  else
-    print_success "yarn already installed"
-  fi
 }
 
 install_gh() {
@@ -276,14 +260,29 @@ install_lazygit() {
 }
 
 install_fonts() {
-  brew tap homebrew/cask-fonts
-  brew install font-caskaydia-cove-nerd-font
-  brew install font-caskaydia-mono-nerd-font
-  print_success "fonts installed installed"
-  
-  # else
-    # print_success "lazygit already installed"
-  # fi
+  brew install homebrew/cask/font-caskaydia-cove-nerd-font
+  brew install homebrew/cask/font-caskaydia-mono-nerd-font
+
+  # brew install font-caskaydia-cove-nerd-font
+  # brew install font-caskaydia-mono-nerd-font
+  print_success "Caskaydia Cove and Mono nerdfonts installed"
+}
+
+install_chatgptcli() {
+  if ! brew info chatgpt &>/dev/null;
+  then
+    # https://github.com/j178/chatgpt
+    brew install j178/tap/chatgpt
+    print_success "lazygit installed"
+  else
+    print_success "lazygit already installed"
+  fi
+  # Remind to add API key if necessary
+  if grep -q OPEN_API_KEY "$HOME/.zshrc.local"; then
+    print_info "     Create chatgpt API key at https://platform.openai.com/account/api-keys"
+    print_info "     # In ~/.zshrc.local"
+    print_info "     export OPENAI_API_KEY=xxx"
+  fi
 }
 
 upgrade_casks() {
@@ -298,24 +297,24 @@ print_info "Installing base developer applications"
 install_homebrew
 install_watchman
 
-# general tools
+# dev tools
 install_gh
 install_lazygit
 install_fonts
-
-# programming languages
-install_fnm # fnm > nvm
-install_rustup
-install_node
-
-# general tools
 install_neovim
 install_tmux
 install_ripgrep
 install_fzf # fuzzy finder
 install_fd # better `find`
 install_zsh
+install_chatgptcli
 # install_alacritty # I usually building alacritty from source weekly.
+
+# programming languages
+install_fnm # fnm > nvm
+install_rustup
+install_node
+
 
 # upgrade_casks
 # dustandeprecated: things I don’t use anymore
