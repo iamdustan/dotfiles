@@ -293,31 +293,39 @@ upgrade_casks() {
 
 print_info "Installing base developer applications"
 
+
+# mac tools
 install_homebrew
 install_watchman
-# fnm > nvm
-# install_nvm
-install_fnm
-install_fzf
-install_fd
-install_rustup
-# I prefer building alacritty from source...
-# install_alacritty
-install_neovim
-install_hub
-install_tmux
-install_zsh
-# install_ag
-install_ripgrep
-install_node
-install_ocaml
-install_amethyst
+
+# general tools
 install_gh
 install_lazygit
 install_fonts
+
+# programming languages
+install_fnm # fnm > nvm
+install_rustup
+install_node
+
+# general tools
+install_neovim
+install_tmux
+install_ripgrep
+install_fzf # fuzzy finder
+install_fd # better `find`
+install_zsh
+# install_alacritty # I usually building alacritty from source weekly.
+
 # upgrade_casks
+# dustandeprecated: things I don’t use anymore
+# install_ocaml # reasonml had a day
+# install_ag # replaced by ripgrep
+# install_amethyst # I don’t like this window manager
+# install_hub
 
 print_info "Remember to build alacritty from source"
 print_info "  git clone git@github.com:alacritty/alacritty.git && cd alacritty && make app"
 print_info "  Finished installing base applications"
+# TODO: set up a cronjob on your computer for this
 
