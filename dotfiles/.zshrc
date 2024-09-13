@@ -2,16 +2,14 @@
 # Path to your oh-my-zsh installation.
 export ZSH=$HOME/.oh-my-zsh
 # https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
-ZSH_THEME="theunraveler"
+export ZSH_THEME="theunraveler"
 
 # Uncomment the following line to enable command auto-correction.
 # ENABLE_CORRECTION="true"
+export EDITOR="nvim"
 
-EDITOR="nvim"
-
-source $ZSH/oh-my-zsh.sh
 plugins+=(git yarn nx-completion)
-
+source $ZSH/oh-my-zsh.sh
 
 bindkey -v
 bindkey "^F" vi-cmd-mode
@@ -77,7 +75,6 @@ bindkey -s "^T" "^[Isudo ^[A" # "t" for "toughguy"
 export PATH="$HOME/bin:$PATH"
 export PATH="$HOME/.yarn/bin:$PATH"
 export PATH="node_modules/.bin:$PATH"
-
 # nvm
 # export NVM_DIR="$HOME/.nvm"
 # [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
