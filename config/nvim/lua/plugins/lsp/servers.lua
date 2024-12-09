@@ -42,7 +42,7 @@ local servers = {
 			},
 		},
 	},
-	tsserver = {
+	ts_ls = {
 		disable_formatting = true,
 		formatting = false,
 	},
