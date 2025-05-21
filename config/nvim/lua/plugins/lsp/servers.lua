@@ -45,6 +45,7 @@ local servers = {
 	ts_ls = {
 		disable_formatting = true,
 		formatting = false,
+		autoformat = false,
 	},
 	bashls = {},
 	dockerls = {},
@@ -71,13 +72,8 @@ function M.setup(_)
 		require("plugins.lsp.keymaps").on_attach(client, buffer)
 	end)
 
-	require("mason-lspconfig").setup({ ensure_installed = vim.tbl_keys(servers) })
-	require("mason-lspconfig").setup_handlers({
-		function(server)
-			local opts = servers[server] or {}
-			opts.capabilities = lsp_capabilities()
-			require("lspconfig")[server].setup(opts)
-		end,
+	require("mason-lspconfig").setup({
+		ensure_installed = vim.tbl_keys(servers),
 	})
 end
 
