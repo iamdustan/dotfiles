@@ -1,4 +1,3 @@
-
 # Path to your oh-my-zsh installation.
 export ZSH=$HOME/.oh-my-zsh
 # https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
@@ -10,6 +9,10 @@ export EDITOR="nvim"
 
 plugins+=(git yarn nx-completion)
 source $ZSH/oh-my-zsh.sh
+
+
+# plugins+=(nx-completions)
+source ~/.oh-my-zsh/custom/plugins/nx-completion/nx-completion.plugin.zsh
 
 bindkey -v
 bindkey "^F" vi-cmd-mode
@@ -66,9 +69,6 @@ bindkey "^Y" accept-and-hold
 bindkey "^N" insert-last-word
 bindkey -s "^T" "^[Isudo ^[A" # "t" for "toughguy"
 
-# aliases
-[[ -f ~/.aliases ]] && source ~/.aliases
-
 # Local config
 [[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
 
@@ -98,4 +98,4 @@ case ":$PATH:" in
 esac
 # pnpm end
 
-export ESLINT_USE_FLAT_CONFIG=true
+

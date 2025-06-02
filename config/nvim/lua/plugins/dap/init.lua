@@ -3,6 +3,7 @@ local M = {
 	dependencies = {
 		{ "nvim-neotest/nvim-nio" },
 		{ "rcarriga/nvim-dap-ui" },
+		{ "nvim-neotest/nvim-nio" },
 		{ "theHamsta/nvim-dap-virtual-text" },
 		{ "nvim-telescope/telescope-dap.nvim" },
 		{ "jbyuki/one-small-step-for-vimkind" },

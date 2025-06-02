@@ -1,3 +1,5 @@
+vim.g.augment_workspace_folders = { "~/projects/webflow" }
+
 return {
 	"nvim-lua/plenary.nvim",
 	"MunifTanjim/nui.nvim",
@@ -44,5 +46,9 @@ return {
 		"karb94/neoscroll.nvim",
 		event = "VeryLazy",
 		config = true,
+	},
+	{
+		"augmentcode/augment.vim",
+		lazy = false,
 	},
 }

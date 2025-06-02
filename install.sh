@@ -285,6 +285,18 @@ install_chatgptcli() {
   fi
 }
 
+
+install_grc() {
+  if ! brew info grc &>/dev/null;
+  then
+    # git submodule update --init --recursive
+    brew install grc
+    print_success "grc installed"
+  else
+    print_success "grc already installed"
+  fi
+}
+
 upgrade_casks() {
     print_info "upgrading casks"
     brew cask upgrade
@@ -307,7 +319,8 @@ install_ripgrep
 install_fzf # fuzzy finder
 install_fd # better `find`
 install_zsh
-install_chatgptcli
+install_grc
+# install_chatgptcli
 # install_alacritty # I usually building alacritty from source weekly.
 
 # programming languages

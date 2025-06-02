@@ -58,6 +58,8 @@ setup_osx() {
 setup_alacritty() {
   mkdir ~/.config > /dev/null 2>&1
   # mkdir ~/.config/alacritty > /dev/null 2>&1
+  # pull the alacritty themes submodule
+  git submodule update --init --recursive
   ln -fs $(pwd)/config/alacritty ~/.config/alacritty
   print_success "alacritty configured"
 }

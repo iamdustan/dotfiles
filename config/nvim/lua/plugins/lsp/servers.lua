@@ -72,9 +72,7 @@ function M.setup(_)
 		require("plugins.lsp.keymaps").on_attach(client, buffer)
 	end)
 
-	require("mason-lspconfig").setup({
-		ensure_installed = vim.tbl_keys(servers),
-	})
+	require("mason-lspconfig").setup({ ensure_installed = vim.tbl_keys(servers) })
 end
 
 return M

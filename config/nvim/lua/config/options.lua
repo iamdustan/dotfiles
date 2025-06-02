@@ -14,7 +14,8 @@ vim.opt.hlsearch = true
 vim.opt.ignorecase = true
 vim.opt.inccommand = "nosplit"
 vim.opt.joinspaces = false
-vim.opt.laststatus = 0
+-- test at 3, was 0
+vim.opt.laststatus = 3
 vim.opt.list = true
 vim.opt.mouse = "a"
 vim.opt.number = true

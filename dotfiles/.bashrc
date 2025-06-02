@@ -18,7 +18,6 @@ fi
 [ -s "$HOME/.config/env" ] && \. "$HOME/.config/env"
 [ -s "$HOME/.config/.aliases" ] && \. "$HOME/.config/.aliases"
 
-EDITOR=nvim
 export EDITOR=nvim
 
 # --files: List files that would be searched but do not search
