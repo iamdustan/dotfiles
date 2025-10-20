@@ -61,7 +61,7 @@ return {
 					nls.builtins.formatting.stylua,
 
 					-- javascript
-					nls.builtins.formatting.prettier,
+					-- nls.builtins.formatting.prettier,
 					require("none-ls.diagnostics.eslint_d"),
 
 					-- clojure
