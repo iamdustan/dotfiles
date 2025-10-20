@@ -16,16 +16,41 @@
 [pull]
 	rebase = true
 [push]
+  default = simple
   autoSetupRemote = true
+  followTags = true
 [fetch]
 	writeCommitGraph = true
+  prune = true
+  pruneTags = true
+  all = true
 [core]
   editor = nvim
+  excludesfile = ~/.gitignore
 
 # Reuse recorded resolution
 [rerere]
 	enabled = true
+  autoupdate = true
+
 [colum]
 	ui = auto
 [branch]
 	sort = -committerdate
+[tag]
+  sort = version:refname
+[diff]
+  algorithm = histogram
+  colorMoved = plain
+  mnemonicPrefix = true
+  renames = true
+
+
+[help]
+  autocorrect = prompt
+[commit]
+  verbose = true
+[rebase]
+  autoSquash = true
+  autoStash = true
+  updateRefs = true
