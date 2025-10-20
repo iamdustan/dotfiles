@@ -27,6 +27,7 @@ return {
 					"vimdoc",
 					"html",
 					-- "clojure",
+					"graphql",
 					"javascript",
 					"json",
 					"lua",
