@@ -6,13 +6,6 @@ return {
 	-- Installs `mcp-hub` node binary globally
 	build = "npm install -g mcp-hub@latest",
 	config = function()
-		require("mcphub").setup({
-			extensions = {
-				avante = {
-					-- make /slash commands from MCP server prompts
-					make_slash_commands = true,
-				},
-			},
-		})
+		require("mcphub").setup()
 	end,
 }
