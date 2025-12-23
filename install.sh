@@ -63,19 +63,6 @@ install_watchman() {
   fi
 }
 
-install_nvm() {
-  if ! cmd_exists "nvm"
-  then
-    if file_exists "$HOME/.nvm"
-    then
-      curl -o- https://raw.githubusercontent.com/creationix/nvm/v1.33.0/install.sh | bash
-      print_success "nvm installed"
-    else
-      print_success "nvm already installed"
-    fi
-  fi
-}
-
 install_fnm() {
   if ! cmd_exists "fnm"
   then
@@ -157,16 +144,6 @@ install_neovim() {
     print_success "neovim (nvim) installed"
   else
     print_success "neovim already installed"
-  fi
-}
-
-# github maintained git util library
-# https://github.com/github/hub
-install_hub() {
-  if ! cmd_exists "hub"
-  then
-    brew install hub
-    print_success "hub installed"
   fi
 }
 
@@ -324,7 +301,7 @@ install_grc
 # install_alacritty # I usually building alacritty from source weekly.
 
 # programming languages
-install_fnm # fnm > nvm
+install_fnm
 install_rustup
 install_node
 
