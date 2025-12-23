@@ -23,7 +23,10 @@ require("lazy").setup("plugins", {
 			"gruvbox",
 		},
 	},
-	checker = { enabled = true },
+	checker = {
+		enabled = true,
+		notify = false, -- Turn off notifications on startup
+	},
 	performance = {
 		rtp = {
 			disabled_plugins = {
