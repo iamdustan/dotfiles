@@ -7,7 +7,7 @@ export ZSH_THEME="theunraveler"
 # ENABLE_CORRECTION="true"
 export EDITOR="nvim"
 
-plugins+=(git yarn nx-completion)
+plugins+=(git nx-completion)
 source $ZSH/oh-my-zsh.sh
 
 
