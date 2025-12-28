@@ -47,11 +47,12 @@ vim.g.mapleader = " "
 vim.g.maplocalleader = ","
 vim.keymap.set({ "n", "v" }, "<Space>", "<Nop>", { silent = true })
 
--- make error diagnositcs only appear in float window when focused with `[d`
+-- make error diagnostics only appear in float window when focused with `[d`
 vim.diagnostic.config({
 	underline = true,
 	signs = true,
 	virtual_text = false,
+	-- virtual_lines = true,
 	float = {
 		show_header = true,
 		source = "if_many",

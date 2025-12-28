@@ -105,7 +105,7 @@ install_ocaml() {
 install_gh() {
   if ! cmd_exists "gh"
   then
-    brew install gh
+    brew install gh &>/dev/null
     print_success "gh installed"
   else
     print_success "gh already installed"

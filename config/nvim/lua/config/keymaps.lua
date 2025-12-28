@@ -53,11 +53,3 @@ keymap("n", "]q", "<cmd>cnext<CR>", { noremap = true })
 keymap("n", "[q", "<cmd>cprevious<CR>", { noremap = true })
 -- keymap("i", "]q", "<c-o>:cnext<CR>", { noremap = true })
 -- keymap("i", "[q", "<c-o>:cprevious<CR>", { noremap = true })
---
---
-
--- keymap("i", '<cr> <cmd>'
-keymap("i", "<CR>", function()
-	vim.fn["augment#Accept"]("\n")
-end, { noremap = true })
--- inoremap <cr> <cmd>call augment#Accept("\n")<cr>

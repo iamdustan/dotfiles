@@ -1,5 +1,3 @@
-vim.g.augment_workspace_folders = { "~/projects/webflow" }
-
 return {
 	"nvim-lua/plenary.nvim",
 	"MunifTanjim/nui.nvim",
@@ -41,6 +39,12 @@ return {
 			vim.api.nvim_set_keymap("v", "g<C-x>", require("dial.map").dec_gvisual(), { noremap = true })
 		end,
 	},
+	{
+		"folke/todo-comments.nvim",
+		event = "VeryLazy",
+		dependencies = { "nvim-lua/plenary.nvim" },
+		opts = {},
+	},
 	--  Stuff
 	{
 		"karb94/neoscroll.nvim",
@@ -48,7 +52,17 @@ return {
 		config = true,
 	},
 	{
+		-- TODO: remove this, only install from a machine-specific config
 		"augmentcode/augment.vim",
 		lazy = false,
+		enabled = false,
+		config = function()
+			vim.g.augment_workspace_folders = { "~/projects/webflow" }
+			-- keymap("i", '<cr> <cmd>'
+			-- inoremap <cr> <cmd>call augment#Accept("\n")<cr>
+			vim.keymap.set("i", "<CR>", function()
+				vim.fn["augment#Accept"]("\n")
+			end, { noremap = true })
+		end,
 	},
 }

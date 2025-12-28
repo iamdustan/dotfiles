@@ -5,8 +5,6 @@ return {
 		dependencies = {
 			-- 💼 Neovim plugin to manage global and project-local settings
 			{ "folke/neoconf.nvim", cmd = "Neoconf", config = true },
-			--  💻 Neovim setup for init.lua and plugin development with full signature help, docs and completion for the nvim lua API.
-			{ "folke/neodev.nvim", config = true },
 			-- Standalone UI for nvim-lsp progress. Eye candy for the impatient
 			{ "j-hui/fidget.nvim", tag = "legacy", event = "LspAttach", config = true },
 			-- Incremental LSP renaming based on Neovim's command-preview feature.
@@ -14,7 +12,7 @@ return {
 
 			--  Easily install and manage LSP servers, DAP servers, linters, and formatters.
 			"williamboman/mason.nvim",
-			-- Extension to mason.nvim that makes it easier to use lspconfig with mason.nvim. Strongly recommended for Windows users.
+			-- Extension to mason.nvim that makes it easier to use lspconfig with mason.nvim.
 			"williamboman/mason-lspconfig.nvim",
 
 			-- nvim-cmp source for neovim's built-in language server client.
@@ -50,7 +48,6 @@ return {
 	},
 
 	-- Use Neovim as a language server to inject LSP diagnostics, code actions, and more via Lua.
-
 	{
 		"nvimtools/none-ls.nvim",
 		event = "BufReadPre",
@@ -63,11 +60,11 @@ return {
 					nls.builtins.formatting.stylua,
 
 					-- javascript
-					-- nls.builtins.formatting.prettier,
-					require("none-ls.diagnostics.eslint_d"),
+					-- require("none-ls.diagnostics.eslint_d"),
 
-					-- clojure
-					-- nls.builtins.formatting.cljstyle,
+					-- cpp
+					nls.builtins.diagnostics.cppcheck,
+					nls.builtins.formatting.clang_format,
 				},
 			})
 		end,

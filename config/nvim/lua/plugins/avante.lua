@@ -19,7 +19,6 @@ return {
 		"stevearc/dressing.nvim", -- for input provider dressing
 		"folke/snacks.nvim", -- for input provider snacks
 		"nvim-tree/nvim-web-devicons", -- or echasnovski/mini.icons
-		"zbirenbaum/copilot.lua", -- for providers='copilot'
 		-- "zbirenbaum/copilot.lua", -- for providers='copilot'
 		{
 			-- support for image pasting
@@ -41,10 +40,18 @@ return {
 		{
 			-- Make sure to set this up properly if you have lazy=true
 			"MeanderingProgrammer/render-markdown.nvim",
-			opts = {
-				file_types = { "markdown", "Avante" },
-			},
+			opts = { file_types = { "markdown", "Avante" } },
 			ft = { "markdown", "Avante" },
+		},
+		-- https://ravitemer.github.io/mcphub.nvim/installation.html
+		{
+			"ravitemer/mcphub.nvim",
+			dependencies = { "nvim-lua/plenary.nvim" },
+			-- Installs `mcp-hub` node binary globally
+			build = "npm install -g mcp-hub",
+			config = function()
+				require("mcphub").setup()
+			end,
 		},
 	},
 }

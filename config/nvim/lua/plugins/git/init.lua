@@ -22,6 +22,12 @@ return {
 		},
 	},
 	-- :GBrowse
-	{ "tpope/vim-fugitive", event = "VeryLazy" },
+	{
+		"tpope/vim-fugitive",
+		event = "VeryLazy",
+		keys = {
+			{ "<leader>gb", "<cmd>GBrowse<cr>", desc = "Open file in GitHub" },
+		},
+	},
 	{ "tpope/vim-rhubarb", event = "VeryLazy" },
 }

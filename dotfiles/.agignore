@@ -1,5 +1,4 @@
 .git/
-bower_components/
 dist
 log
 node_modules/

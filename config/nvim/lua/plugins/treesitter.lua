@@ -26,6 +26,7 @@ return {
 					"bash",
 					"vimdoc",
 					"html",
+					"graphql",
 					-- "clojure",
 					"graphql",
 					"javascript",
