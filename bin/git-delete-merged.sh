@@ -1,0 +1,224 @@
+#!/bin/bash
+# Forked from https://github.com/fatso83/dotfiles/blob/master/utils/scripts/git-delete-merged
+# TODO: make it run by default and have `--dry` be opt-in
+
+if [[ x$DEBUG != x ]]; then
+    PS4='$LINENO: '
+    set -x
+fi
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+DRY_RUN=1
+
+# Check if we are running in a git repo
+GIT_OK=$(git status 2> /dev/stdout)
+if [[ $? != 0 ]]; then
+    echo $GIT_OK > /dev/stderr
+    echo "This command must be run within a git repo!"
+    exit 1
+fi
+
+UPSTREAM=$(git branch  -avv | sed -E -n -e '/\*/s/\*\s+\S+\s+\S+\s+\[(\S+)\/(\S+)(: .*)?\].*/\1\/\2/p')
+CURRENT=$(git branch -a | sed -n '/^*/s/^* //p')
+
+##  Usage: @script.name [--doit] <[--local] | --remote <remote>> [--branches-to-skip <branches to skip>]
+## 
+##  Example to delete all branches on GitHub matching 'patch-': 
+##          git-delete-merged --doit --remote github --match patch-
+## 
+##  Options:
+##      -d, --doit              Execute the plan. 
+##      -l, --local             Operate on local branches
+##      --remote=my-remote      Operate on remote branches on the remote repo
+##      --skip=branches         The list of branches to skip. Default is "master,develop"
+##      --match=<regex>         Only delete branch names matching <regex>
+##      --merge-master=branch   Branch to use as the master when deciding if a branch has been merged. Default 'origin/master'
+## 
+##  By default, "master" and "develop" are skipped
+##  Specifying x-delete-tool.protected-branches in your git config, or
+##  listing them on the command line with commas will override this
+##
+##  Likewise, you can store a permanent override for what constitutes 
+##  the main branch by setting the x-delete-tool.merge-master property
+##  Example:
+##  git config --add x-delete-tool.merge-branch origin/develop
+
+skipped(){
+    local override=$1
+    local default='master,main,develop,dev'
+    local setting="$(git config --get --default $default x-delete-tool.protected-branches)"
+
+    # command line args trumps git config
+    if [[ -n "$override" ]]; then
+        echo $override
+        return
+    fi
+
+    echo $setting
+}
+
+merge_branch(){
+    local default='origin/main'
+    local setting="$(git config --default $default --get x-delete-tool.merge-master)"
+
+    # command line args trumps git config
+    if [[ -n "$merge_master" ]]; then
+        echo $merge_master
+        return
+    fi
+
+    echo $setting
+}
+
+print-branches(){
+    for b in $@; do
+        echo "   $b"
+    done
+}
+
+# filters out the skipped branches and wraps each branch name in a regex with start/stop markers
+# @returns a list of branch names as exact regexes: '^foo$ ^bar$ ^baz$'
+filter-branches(){
+    egrep -v \
+        "$(skipped $skip |  # get the skipped branches
+
+            # replace 'a,b,c' with regex 'a|b|c'
+            # then replace 'a|b|c' with '^a$|^b$|^c$'
+            util.esed -e 's/,/|/g' \
+                      -e 's/([a-zA-Z0-9_-]+)/^\1$/g' 
+        )" | # sub-shell end 
+        egrep "$match" | # just keep lines matching $match - if unset, it matches all
+        paste -s - # actually not totally sure about why this is here anymore ...
+}
+
+main(){
+    if [[ -n $doit ]];then
+        DRY_RUN=0
+    fi
+
+    no_branches_msg="No branches to delete"
+    delete_branches_msg="Deleting the following branches"
+    MAIN_BRANCH=$(merge_branch)
+
+    if ! git log $MAIN_BRANCH > /dev/null 2>/dev/null; then 
+        echo "Branch \"$MAIN_BRANCH\" does not exist. Specify another branch using --merge-branch"
+        exit 1
+    fi
+
+    if [[ -n $local ]];then
+        branches=$(
+                        git branch --merged $MAIN_BRANCH |  # show local, merged branches 
+                        util.esed -n 's/..(.*)/\1/p' | # remove first two characters
+                        egrep -v "$CURRENT" |  # it's usually an error to remove the branch you are on   '
+                        filter-branches    # remove skipped and filter on matches
+                )
+
+    else 
+        # in case we should have a situation where upstream cannot be decided (maybe local branch?)
+        # we need to set upstream to a default non-matching value when filtering upstream out
+        UPSTREAM=${UPSTREAM:-xxxxxxxxxxxxxxx}
+        branches=$(
+                    git branch -r --merged  $MAIN_BRANCH |  # show remote merged branches
+                        grep "  $remote"          |  # just keep lines with remote
+                        egrep -v "$UPSTREAM"      |  # it's usually an error to remove the branch you are on   '
+                        egrep -v "$MAIN_BRANCH"   |  # it's usually an error to remove the main branch 
+                        egrep -v "HEAD ->"        |  # remove irrelevant noise
+                        util.esed -n 's/  \w*\/(.*)/\1/p' | # remove the remote/ bit 
+                        filter-branches        # remove skipped and filter on matches
+                )
+        no_branches_msg="${no_branches_msg} on ${remote}"
+        delete_branches_msg="${delete_branches_msg} on ${remote}"
+    fi
+
+
+    if [[ x$branches == x ]];then
+        echo $no_branches_msg
+        exit 1
+    fi
+
+    if [[ x$DRY_RUN == x1 ]]; then
+        echo "NOT DELETING any branches. Pass --doit to go through with action."
+        echo
+        echo "Would have deleted the following branches:"
+        print-branches $branches
+        echo
+        echo "Would have skipped these branches: "
+        print-branches $(skipped $skip | tr ',' ' ')
+    else
+        echo "$delete_branches_msg"
+        print-branches $branches
+        echo
+        echo "Pausing for 2 seconds ... Press Ctrl-C to quit"
+        sleep 2
+
+        if [[ -n $local ]];then
+            git branch -d $branches
+        else 
+            git push --no-verify --delete $remote $branches
+        fi
+    fi
+}
+
+usage(){
+    $0 --help 
+    exit 1
+}
+
+# mini test-suite
+if [[ -n $self_test ]]; then
+    verify(){
+        if [[ $? = 0 ]];then
+            echo OK
+        else
+            echo fail && exit 1
+        fi
+    }
+    title(){ printf "    %-20s: " "$1"; }
+    
+    echo '#filter-branches() test'
+
+    title "filter test1"
+    skip="foo,bar,p1" branches="b1\nfoo\nbar\np1"
+    [[ $(/bin/echo -e "$branches" | filter-branches) == "b1" ]]
+    verify
+
+    title "filter test2"
+    skip="foo-bar,p1" branches="b1\nfoo-bar\np1"
+    [[ $(/bin/echo -e "$branches" | filter-branches) == "b1" ]] 
+    verify
+
+    title "filter test3"
+    skip="foo-bar,p1" branches="b1\nfoo-bar\np1"
+    [[ $(/bin/echo -e "$branches" | filter-branches) == "b1" ]]
+    verify
+
+    printf '\n%s\n' '#skipped() test'
+
+    title "verify defaults"
+    [[ $(skipped) == "master,main,develop" ]]
+    verify
+
+    title "verify override"
+    [[ $(skipped override1) == "override1" ]]
+    verify
+
+    exit # needs to be present to just do this test
+fi
+
+if [[ -n $local && -n $remote ]]; then
+    /bin/echo -e "\n ERROR: Can\'t specify both remote and local options!\n"
+    usage
+fi
+
+if [[ ! -n $local && ! -n $remote ]]; then
+    printf "\n ERROR: Need to specify either remote or local option!\n"
+    usage
+fi
+
+if [[ -n $local || -n $remote ]]; then
+    main "$@"
+else
+    usage
+fi
+
+# vim: ft=sh
