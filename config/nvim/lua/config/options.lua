@@ -15,7 +15,7 @@ vim.opt.ignorecase = true
 vim.opt.inccommand = "nosplit"
 vim.opt.joinspaces = false
 -- test at 3, was 0
-vim.opt.laststatus = 3
+vim.opt.laststatus = 2 -- always display the status line
 vim.opt.list = true
 vim.opt.mouse = "a"
 vim.opt.number = true
@@ -41,7 +41,6 @@ vim.opt.timeoutlen = 300
 vim.opt.undofile = true
 vim.opt.updatetime = 200
 vim.opt.wildmode = "longest:full,full"
-vim.opt.laststatus = 2 -- always display the status line
 
 vim.g.mapleader = " "
 vim.g.maplocalleader = ","
