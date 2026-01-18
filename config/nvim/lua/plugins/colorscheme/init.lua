@@ -32,9 +32,9 @@ return {
 		config = function()
 			local catpuccin = require("catppuccin")
 			-- catpuccin.setup({ flavour = "latte" })
-			--catpuccin.setup({ flavour = "frappe" })
-			catpuccin.setup({ flavour = "macchiato" })
-			-- catpuccin.setup({ flavour = "mocha" })
+			-- catpuccin.setup({ flavour = "frappe" })
+			-- catpuccin.setup({ flavour = "macchiato" })
+			catpuccin.setup({ flavour = "mocha" })
 			catpuccin.load()
 		end,
 	},

@@ -1,3 +1,13 @@
+[general]
+live_config_reload = true
+import = [
+  # "./themes.yml",
+  # "./themes/themes/remedy_dark.toml",
+  # "./themes/themes/nord_light.toml",
+  # "./themes/themes/rose_pine_moon.toml",
+  # "./themes/themes/catppuccin_latte.toml",
+  "./themes/themes/catppuccin_macchiato.toml",
+]
 
 [bell]
 animation = "EaseOutExpo"
@@ -520,9 +530,5 @@ lines = 40
 [window.padding]
 x = 2
 y = 2
-
-[general]
-live_config_reload = true
-import = ["./themes/themes/catppuccin_macchiato.toml"]
 
 [terminal]
