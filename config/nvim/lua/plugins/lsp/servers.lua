@@ -1,33 +1,6 @@
 local M = {}
 
 local servers = {
-	--[[
-	-- FIXME copied from plugins/extras/lang/rust.lua
-	["rust-analyzer"] = {
-		check = { command = "clippy" },
-		diagnostics = { enable = true },
-		cargo = {
-			allFeatures = true,
-			loadOutDirsFromCheck = true,
-			runBuildScripts = true,
-		},
-		-- Add clippy lints for Rust.
-		checkOnSave = {
-			allFeatures = true,
-			command = "clippy",
-			extraArgs = { "--no-deps" },
-		},
-		procMacro = {
-			enable = true,
-			ignored = {
-				["async-trait"] = { "async_trait" },
-				["napi-derive"] = { "napi" },
-				["async-recursion"] = { "async_recursion" },
-			},
-		},
-	},
-  --]]
-
 	lua_ls = {
 		settings = {
 			Lua = {
@@ -49,6 +22,18 @@ local servers = {
 	},
 	bashls = {},
 	dockerls = {},
+	clangd = {},
+	harper_ls = {
+		settings = {
+			["harper-ls"] = {
+				linters = {
+					SentenceCapitalization = false,
+					ToDoHyphen = false,
+					SpellCheck = false,
+				},
+			},
+		},
+	},
 }
 
 local function lsp_attach(on_attach)

@@ -1,6 +1,5 @@
 return {
 	-- Extend auto completion
-	--[[
 	{
 		"hrsh7th/nvim-cmp",
 		dependencies = {
@@ -13,16 +12,14 @@ return {
 			},
 		},
 		---@param opts cmp.ConfigSchema
-
 		opts = function(_, opts)
 			local cmp = require("cmp")
+			opts.sources = opts.sources or {}
 			opts.sources = cmp.config.sources(vim.list_extend(opts.sources, {
 				{ name = "crates" },
 			}))
 		end,
 	},
-    --]]
-
 	-- Add Rust & related to treesitter
 	{
 		"nvim-treesitter/nvim-treesitter",
@@ -38,19 +35,21 @@ return {
 		optional = true,
 		opts = function(_, opts)
 			opts.ensure_installed = opts.ensure_installed or {}
-			vim.list_extend(opts.ensure_installed, { "codelldb" })
+			vim.list_extend(opts.ensure_installed, { "codelldb", "rust_analyzer" })
 		end,
 	},
-
+	--[[
 	{
 		"mrcjkb/rustaceanvim",
-		version = "^4", -- Recommended
+		version = "^6", -- Recommended
+		lazy = false, -- This plugin is already lazy
 		ft = { "rust" },
 		opts = {
 			server = {
 				on_attach = function(client, bufnr)
 					-- register which-key mappings
 					local wk = require("which-key")
+
 					wk.add({
 						["<leader>cR"] = {
 							function()
@@ -98,10 +97,36 @@ return {
 			vim.g.rustaceanvim = vim.tbl_deep_extend("force", {}, opts or {})
 		end,
 	},
+  ]]
+	--
+
+	{
+		"nwiizo/cargo.nvim",
+		build = "cargo build --release",
+		config = function()
+			require("cargo").setup({
+				float_window = true,
+				window_width = 0.8,
+				window_height = 0.8,
+				border = "rounded",
+				auto_close = true,
+				close_timeout = 5000,
+			})
+		end,
+		ft = { "rust" },
+		cmd = {
+			"CargoBench",
+			"CargoBuild",
+			"CargoClean",
+			"CargoDoc",
+			"CargoNew",
+			"CargoRun",
+			"CargoTest",
+			"CargoUpdate",
+		},
+	},
 
 	-- Correctly setup lspconfig for Rust 🚀
-	-- TODO: figure out how to extend these rather than overwrite
-	--[[
 	{
 		"neovim/nvim-lspconfig",
 		opts = {
@@ -112,8 +137,9 @@ return {
 						{
 							"K",
 							function()
-								if vim.fn.expand("%:t") == "Cargo.toml" and require("crates").popup_available() then
-									require("crates").show_popup()
+								local c = require("crate")
+								if vim.fn.expand("%:t") == "Cargo.toml" and c.popup_available() then
+									c.show_popup()
 								else
 									vim.lsp.buf.hover()
 								end
@@ -123,23 +149,18 @@ return {
 					},
 				},
 			},
-			setup = {
-				rust_analyzer = function()
-					return true
-				end,
-			},
 		},
 	},
 
+	--[[
 	{
 		"nvim-neotest/neotest",
 		optional = true,
 		opts = function(_, opts)
 			opts.adapters = opts.adapters or {}
-			vim.list_extend(opts.adapters, {
-				require("rustaceanvim.neotest"),
-			})
+			vim.list_extend(opts.adapters, { require("rustaceanvim.neotest"), })
 		end,
 	},
-	--]]
+  ]]
+	--
 }
