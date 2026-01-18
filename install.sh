@@ -111,6 +111,16 @@ install_gh() {
     print_success "gh already installed"
   fi
 }
+install_gitdelta() {
+  if ! brew list git-delta >/dev/null 2>&1
+  then
+    brew install git-delta &>/dev/null
+    print_success "git-delta installed"
+  else
+    print_success "git-delta already installed"
+  fi
+}
+
 
 install_rustup() {
   if ! cmd_exists "cargo"
@@ -288,6 +298,7 @@ install_watchman
 
 # dev tools
 install_gh
+install_gitdelta
 install_lazygit
 install_fonts
 install_neovim

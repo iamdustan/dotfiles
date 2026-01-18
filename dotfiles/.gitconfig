@@ -1,8 +1,21 @@
 [user]
   name = Dustan Kasten
   email = dustan.kasten@gmail.com
+[core]
+  editor = nvim
+  excludesfile = ~/.gitignore
+  pager = delta
+
+[interactive]
+  diffFilter = delta --color-only
+
+[delta]
+    navigate = true  # use n and N to move between diff sections
+    dark = true      # or light = true, or omit for auto-detection
+
 [merge]
-  conflictstyle = diff3
+  conflictstyle = zdiff3
+
 [alias]
   checkout-branch = !git branch --sort='-*committerdate' | fzf | xargs git checkout
   cleanup-branch = !git branch --sort='-*committerdate' | fzf -m | xargs git branch -d
@@ -19,14 +32,14 @@
   default = simple
   autoSetupRemote = true
   followTags = true
+  default = simple
+  followTags = true
+
 [fetch]
 	writeCommitGraph = true
   prune = true
   pruneTags = true
   all = true
-[core]
-  editor = nvim
-  excludesfile = ~/.gitignore
 
 # Reuse recorded resolution
 [rerere]
@@ -37,6 +50,7 @@
 	ui = auto
 [branch]
 	sort = -committerdate
+
 [tag]
   sort = version:refname
 [diff]
@@ -45,9 +59,9 @@
   mnemonicPrefix = true
   renames = true
 
-
 [help]
-  autocorrect = prompt
+  autocorrect = 10
+
 [commit]
   verbose = true
 [rebase]
