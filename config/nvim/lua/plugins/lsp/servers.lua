@@ -35,7 +35,6 @@ end
 function M.setup(_)
 	local capabilities = lsp_capabilities()
 
-	-- Set up the LspAttach autocmd for common functionality
 	lsp_attach(function(client, buffer)
 		require("plugins.lsp.format").on_attach(client, buffer)
 		require("plugins.lsp.keymaps").on_attach(client, buffer)
@@ -47,16 +46,40 @@ function M.setup(_)
 			server_config.on_attach(client, buffer)
 		end
 
-		-- For harper_ls, send settings via workspace/didChangeConfiguration
+		-- For harper_ls, send filetype-specific settings via workspace/didChangeConfiguration
 		-- This is needed because harper_ls doesn't always pick up settings from initial config
-		if server_name == "harper_ls" and server_config and server_config.settings then
-			vim.defer_fn(function()
+		-- and we use different rules based on filetype
+		if server_name == "harper_ls" and server_config then
+			local function send_harper_settings()
 				if client and not client.is_stopped() then
-					client.notify("workspace/didChangeConfiguration", {
-						settings = server_config.settings,
-					})
+					-- Get filetype-specific settings if get_settings function is available
+					local settings = server_config.settings
+					if server_config.get_settings then
+						local filetype = vim.bo[buffer].filetype
+						local filetype_settings = server_config.get_settings(filetype)
+						if filetype_settings then
+							settings = filetype_settings
+						end
+					end
+
+					if settings then
+						client.notify("workspace/didChangeConfiguration", {
+							settings = settings,
+						})
+					end
 				end
-			end, 200)
+			end
+
+			-- Send settings after attach
+			vim.defer_fn(send_harper_settings, 200)
+
+			-- Also send settings when filetype changes
+			vim.api.nvim_create_autocmd("FileType", {
+				buffer = buffer,
+				callback = function()
+					vim.defer_fn(send_harper_settings, 100)
+				end,
+			})
 		end
 
 		-- Handle server-specific keys if defined
@@ -81,27 +104,18 @@ function M.setup(_)
 	require("mason-lspconfig").setup({
 		ensure_installed = vim.tbl_keys(server_configs),
 		handlers = {
-			-- Default handler for all servers
 			function(server_name)
 				local config = server_configs[server_name]
 				if not config then
 					return
 				end
 
-				-- Build the server configuration
-				local server_opts = {
-					capabilities = capabilities,
-				}
-
-				-- Add settings if present
+				-- Build the server configuration and settings
+				local server_opts = { capabilities = capabilities }
 				if config.settings then
 					server_opts.settings = config.settings
 				end
 
-				-- Note: harper_ls settings are sent via workspace/didChangeConfiguration
-				-- in the LspAttach handler above, as it needs to be sent after the client is fully ready
-
-				-- Setup the server
 				lspconfig[server_name].setup(server_opts)
 			end,
 		},
