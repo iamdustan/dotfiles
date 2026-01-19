@@ -11,6 +11,7 @@ local server_configs = {
 	clangd = require("plugins.lsp.lang.cpp"),
 	taplo = require("plugins.lsp.lang.taplo"),
 	harper_ls = require("plugins.lsp.lang.harper"),
+	tailwindcss = require("plugins.lsp.lang.tailwind"),
 	-- rust_analyzer is handled by rustaceanvim in extras/lang/rust.lua
 	rust_analyzer = {},
 }
@@ -114,6 +115,11 @@ function M.setup(_)
 				local server_opts = { capabilities = capabilities }
 				if config.settings then
 					server_opts.settings = config.settings
+				end
+
+				-- Add root_dir if specified
+				if config.root_dir then
+					server_opts.root_dir = config.root_dir
 				end
 
 				lspconfig[server_name].setup(server_opts)

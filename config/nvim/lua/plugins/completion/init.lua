@@ -19,6 +19,11 @@ return {
 			"hrsh7th/cmp-buffer",
 			"hrsh7th/cmp-path",
 			"hrsh7th/cmp-cmdline",
+			-- Tailwind CSS color previews in completion menu
+			{
+				"roobert/tailwindcss-colorizer-cmp.nvim",
+				config = true,
+			},
 		},
 		config = function()
 			local cmp = require("cmp")
@@ -88,7 +93,15 @@ return {
 				},
 				formatting = {
 					fields = { "kind", "abbr", "menu" },
+					expandable_indicator = true,
+
 					format = function(entry, item)
+						-- Apply Tailwind colorizer formatting if available
+						local ok, colorizer = pcall(require, "tailwindcss-colorizer-cmp")
+						if ok and colorizer then
+							colorizer.formatter(entry, item)
+						end
+
 						local max_width = 0
 						local source_names = {
 							nvim_lsp = "(LSP)",
