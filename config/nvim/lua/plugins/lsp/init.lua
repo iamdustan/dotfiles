@@ -47,31 +47,6 @@ return {
 		end,
 	},
 
-	-- Use Neovim as a language server to inject LSP diagnostics, code actions, and more via Lua.
-	{
-		"nvimtools/none-ls.nvim",
-		event = "BufReadPre",
-		dependencies = { "mason.nvim", "nvimtools/none-ls-extras.nvim" },
-		config = function()
-			local nls = require("null-ls")
-			nls.setup({
-				sources = {
-					-- lua
-					nls.builtins.formatting.stylua,
-
-					-- javascript
-					-- nls.builtins.formatting.prettier,
-					-- require("none-ls.diagnostics.eslint_d"),
-					-- clojure
-					-- nls.builtins.formatting.cljstyle,
-
-					-- cpp
-					nls.builtins.diagnostics.cppcheck,
-					nls.builtins.formatting.clang_format,
-				},
-			})
-		end,
-	},
 
 	-- A VS Code like winbar for Neovim
 	{
