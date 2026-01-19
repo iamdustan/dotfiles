@@ -6,6 +6,9 @@
   editor = nvim
   excludesfile = ~/.gitignore
 
+#------------------------------------------------------------------------
+# Display & UI
+#------------------------------------------------------------------------
 [pager]
   pager = delta
 
@@ -17,11 +20,15 @@
   dark = true      # or light = true, or omit for auto-detection
 
 [column]
-  ui = auto
+  ui = auto        # enable column output for commands like 'git branch'
+  status = plain   # disable column output for 'git status' (show untracked files as list)
 
 [help]
-  autocorrect = 10
+  autocorrect = 10 # auto-correct typos in commands after 1 second
 
+#------------------------------------------------------------------------
+# Branch & tag management
+#------------------------------------------------------------------------
 [init]
   defaultBranch = main
 
@@ -29,42 +36,55 @@
   sort = -committerdate
 
 [tag]
-  sort = version:refname
+  sort = version:refname  # sort tags by version number
 
+#------------------------------------------------------------------------
+# Remote operations
+#------------------------------------------------------------------------
 [fetch]
-  writeCommitGraph = true
-  prune = true
-  pruneTags = true
-  all = true
+  writeCommitGraph = true  # write commit-graph file for faster operations
+  prune = true             # remove remote-tracking branches that no longer exist
+  pruneTags = true         # remove remote-tracking tags that no longer exist
+  all = true               # fetch all remotes
 
 [pull]
-  rebase = true
+  rebase = true  # use rebase instead of merge when pulling
 
 [push]
-  default = simple
-  autoSetupRemote = true
-  followTags = true
+  default = simple        # only push current branch if it has upstream
+  autoSetupRemote = true  # automatically set up remote tracking
+  followTags = true       # push tags that point to commits being pushed
 
+#------------------------------------------------------------------------
+# Merge & conflict resolution
+#------------------------------------------------------------------------
 [merge]
-  conflictstyle = zdiff3
+  conflictstyle = zdiff3  # show common ancestor in 3-way merge conflicts
 
+#------------------------------------------------------------------------
+# Reuse recorded resolution
+# Automatically reuses conflict resolutions from previous merges
+#------------------------------------------------------------------------
 [rerere]
-  enabled = true
-  autoupdate = true
+  enabled = true    # enable rerere
+  autoupdate = true # automatically stage resolved files
 
+#------------------------------------------------------------------------
+# Diff, commit, rebase, aliases...normal stuff
+#------------------------------------------------------------------------
 [diff]
-  algorithm = histogram
-  colorMoved = plain
-  mnemonicPrefix = true
-  renames = true
+  algorithm = histogram   # use histogram diff algorithm (better for large files)
+  colorMoved = plain      # highlight moved lines in diffs
+  mnemonicPrefix = true   # use shorter prefixes (C/M/D instead of Copy/Move/Delete)
+  renames = true          # detect renames
 
 [commit]
-  verbose = true
+  verbose = true  # show diff in commit message editor
 
 [rebase]
-  autoSquash = true
-  autoStash = true
-  updateRefs = true
+  autoSquash = true   # automatically squash fixup commits
+  autoStash = true    # automatically stash before rebase
+  updateRefs = true   # update branches that point to commits being rebased
 
 [alias]
   checkout-branch = !git branch --sort='-*committerdate' | fzf | xargs git checkout
@@ -74,5 +94,6 @@
   bb = !better-git-branch.sh
   about = "!describe() { msg=\"$1\"; git config branch.\"$(git rev-parse --abbrev-ref HEAD)\".description ${msg:+\"$msg\"}; }; describe"
 
+# Local overrides not tracked in dotfiles, if exists
 [include]
   path = ~/.gitconfig.local
