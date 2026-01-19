@@ -1,39 +1,18 @@
 local M = {}
 
-local servers = {
-	lua_ls = {
-		settings = {
-			Lua = {
-				workspace = {
-					checkThirdParty = false,
-				},
-				completion = { callSnippet = "Replace" },
-				telemetry = { enable = false },
-				hint = {
-					enable = false,
-				},
-			},
-		},
-	},
-	ts_ls = {
-		disable_formatting = true,
-		formatting = false,
-		autoformat = false,
-	},
-	bashls = {},
-	dockerls = {},
-	clangd = {},
-	harper_ls = {
-		settings = {
-			["harper-ls"] = {
-				linters = {
-					SentenceCapitalization = false,
-					ToDoHyphen = false,
-					SpellCheck = false,
-				},
-			},
-		},
-	},
+local lspconfig = require("lspconfig")
+
+-- Map server names to their language configuration files
+local server_configs = {
+	lua_ls = require("plugins.lsp.lang.lua"),
+	ts_ls = require("plugins.lsp.lang.typescript"),
+	bashls = require("plugins.lsp.lang.bash"),
+	dockerls = require("plugins.lsp.lang.docker"),
+	clangd = require("plugins.lsp.lang.cpp"),
+	taplo = require("plugins.lsp.lang.taplo"),
+	harper_ls = require("plugins.lsp.lang.harper"),
+	-- rust_analyzer is handled by rustaceanvim in extras/lang/rust.lua
+	rust_analyzer = {},
 }
 
 local function lsp_attach(on_attach)
@@ -41,7 +20,9 @@ local function lsp_attach(on_attach)
 		callback = function(args)
 			local bufnr = args.buf
 			local client = vim.lsp.get_client_by_id(args.data.client_id)
-			on_attach(client, bufnr)
+			if client then
+				on_attach(client, bufnr)
+			end
 		end,
 	})
 end
@@ -52,12 +33,79 @@ local function lsp_capabilities()
 end
 
 function M.setup(_)
+	local capabilities = lsp_capabilities()
+
+	-- Set up the LspAttach autocmd for common functionality
 	lsp_attach(function(client, buffer)
 		require("plugins.lsp.format").on_attach(client, buffer)
 		require("plugins.lsp.keymaps").on_attach(client, buffer)
+
+		-- Handle server-specific on_attach if defined
+		local server_name = client.name
+		local server_config = server_configs[server_name]
+		if server_config and server_config.on_attach then
+			server_config.on_attach(client, buffer)
+		end
+
+		-- For harper_ls, send settings via workspace/didChangeConfiguration
+		-- This is needed because harper_ls doesn't always pick up settings from initial config
+		if server_name == "harper_ls" and server_config and server_config.settings then
+			vim.defer_fn(function()
+				if client and not client.is_stopped() then
+					client.notify("workspace/didChangeConfiguration", {
+						settings = server_config.settings,
+					})
+				end
+			end, 200)
+		end
+
+		-- Handle server-specific keys if defined
+		if server_config and server_config.keys then
+			local wk_ok, wk = pcall(require, "which-key")
+			for _, keymap in ipairs(server_config.keys) do
+				local mode = keymap.mode or "n"
+				local lhs = keymap[1]
+				local rhs = keymap[2] or keymap.rhs
+				local desc = keymap.desc
+				local opts = keymap.opts or {}
+
+				if wk_ok and wk then
+					wk.register({ [lhs] = { rhs, desc } }, { mode = mode, buffer = buffer })
+				else
+					vim.keymap.set(mode, lhs, rhs, vim.tbl_extend("force", { buffer = buffer, desc = desc }, opts))
+				end
+			end
+		end
 	end)
 
-	require("mason-lspconfig").setup({ ensure_installed = vim.tbl_keys(servers) })
+	require("mason-lspconfig").setup({
+		ensure_installed = vim.tbl_keys(server_configs),
+		handlers = {
+			-- Default handler for all servers
+			function(server_name)
+				local config = server_configs[server_name]
+				if not config then
+					return
+				end
+
+				-- Build the server configuration
+				local server_opts = {
+					capabilities = capabilities,
+				}
+
+				-- Add settings if present
+				if config.settings then
+					server_opts.settings = config.settings
+				end
+
+				-- Note: harper_ls settings are sent via workspace/didChangeConfiguration
+				-- in the LspAttach handler above, as it needs to be sent after the client is fully ready
+
+				-- Setup the server
+				lspconfig[server_name].setup(server_opts)
+			end,
+		},
+	})
 end
 
 return M
