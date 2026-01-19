@@ -1,20 +1,70 @@
 [user]
   name = Dustan Kasten
   email = dustan.kasten@gmail.com
+
 [core]
   editor = nvim
   excludesfile = ~/.gitignore
+
+[pager]
   pager = delta
 
 [interactive]
   diffFilter = delta --color-only
 
 [delta]
-    navigate = true  # use n and N to move between diff sections
-    dark = true      # or light = true, or omit for auto-detection
+  navigate = true  # use n and N to move between diff sections
+  dark = true      # or light = true, or omit for auto-detection
+
+[column]
+  ui = auto
+
+[help]
+  autocorrect = 10
+
+[init]
+  defaultBranch = main
+
+[branch]
+  sort = -committerdate
+
+[tag]
+  sort = version:refname
+
+[fetch]
+  writeCommitGraph = true
+  prune = true
+  pruneTags = true
+  all = true
+
+[pull]
+  rebase = true
+
+[push]
+  default = simple
+  autoSetupRemote = true
+  followTags = true
 
 [merge]
   conflictstyle = zdiff3
+
+[rerere]
+  enabled = true
+  autoupdate = true
+
+[diff]
+  algorithm = histogram
+  colorMoved = plain
+  mnemonicPrefix = true
+  renames = true
+
+[commit]
+  verbose = true
+
+[rebase]
+  autoSquash = true
+  autoStash = true
+  updateRefs = true
 
 [alias]
   checkout-branch = !git branch --sort='-*committerdate' | fzf | xargs git checkout
@@ -22,49 +72,7 @@
   sync-branch = !git fetch origin main | git rebase origin/main
   pf = push --force-with-lease
   bb = !better-git-branch.sh
-	about = "!describe() { msg=\"$1\"; git config branch.\"$(git rev-parse --abbrev-ref HEAD)\".description ${msg:+\"$msg\"}; }; describe"
+  about = "!describe() { msg=\"$1\"; git config branch.\"$(git rev-parse --abbrev-ref HEAD)\".description ${msg:+\"$msg\"}; }; describe"
 
-[init]
-	defaultBranch = main
-[pull]
-	rebase = true
-[push]
-  default = simple
-  autoSetupRemote = true
-  followTags = true
-  default = simple
-  followTags = true
-
-[fetch]
-	writeCommitGraph = true
-  prune = true
-  pruneTags = true
-  all = true
-
-# Reuse recorded resolution
-[rerere]
-	enabled = true
-  autoupdate = true
-
-[colum]
-	ui = auto
-[branch]
-	sort = -committerdate
-
-[tag]
-  sort = version:refname
-[diff]
-  algorithm = histogram
-  colorMoved = plain
-  mnemonicPrefix = true
-  renames = true
-
-[help]
-  autocorrect = 10
-
-[commit]
-  verbose = true
-[rebase]
-  autoSquash = true
-  autoStash = true
-  updateRefs = true
+[include]
+  path = ~/.gitconfig.local
