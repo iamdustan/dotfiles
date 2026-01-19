@@ -60,7 +60,10 @@ return {
 					nls.builtins.formatting.stylua,
 
 					-- javascript
+					-- nls.builtins.formatting.prettier,
 					-- require("none-ls.diagnostics.eslint_d"),
+					-- clojure
+					-- nls.builtins.formatting.cljstyle,
 
 					-- cpp
 					nls.builtins.diagnostics.cppcheck,

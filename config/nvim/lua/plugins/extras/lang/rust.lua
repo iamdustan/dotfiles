@@ -38,7 +38,6 @@ return {
 			vim.list_extend(opts.ensure_installed, { "codelldb", "rust_analyzer" })
 		end,
 	},
-	--[[
 	{
 		"mrcjkb/rustaceanvim",
 		version = "^6", -- Recommended
@@ -97,8 +96,6 @@ return {
 			vim.g.rustaceanvim = vim.tbl_deep_extend("force", {}, opts or {})
 		end,
 	},
-  ]]
-	--
 
 	{
 		"nwiizo/cargo.nvim",
@@ -151,16 +148,12 @@ return {
 			},
 		},
 	},
-
-	--[[
 	{
 		"nvim-neotest/neotest",
 		optional = true,
 		opts = function(_, opts)
 			opts.adapters = opts.adapters or {}
-			vim.list_extend(opts.adapters, { require("rustaceanvim.neotest"), })
+			vim.list_extend(opts.adapters, { require("rustaceanvim.neotest") })
 		end,
 	},
-  ]]
-	--
 }
