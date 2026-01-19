@@ -13,7 +13,7 @@ local server_configs = {
 	harper_ls = require("plugins.lsp.lang.harper"),
 	tailwindcss = require("plugins.lsp.lang.tailwind"),
 	-- rust_analyzer is handled by rustaceanvim in extras/lang/rust.lua
-	rust_analyzer = {},
+	-- rust_analyzer = {},
 }
 
 local function lsp_attach(on_attach)
@@ -39,6 +39,17 @@ function M.setup(_)
 	lsp_attach(function(client, buffer)
 		require("plugins.lsp.format").on_attach(client, buffer)
 		require("plugins.lsp.keymaps").on_attach(client, buffer)
+
+		-- Attach navic for winbar (barbecue.nvim)
+		-- Only attach if client supports document symbols
+		-- Skip rust-analyzer as it's handled in rustaceanvim's on_attach
+		if client.server_capabilities.documentSymbolProvider and client.name ~= "rust-analyzer" then
+			local navic_ok, navic = pcall(require, "nvim-navic")
+			if navic_ok and navic then
+				-- Use pcall to silently ignore "already attached" errors
+				pcall(navic.attach, client, buffer)
+			end
+		end
 
 		-- Handle server-specific on_attach if defined
 		local server_name = client.name

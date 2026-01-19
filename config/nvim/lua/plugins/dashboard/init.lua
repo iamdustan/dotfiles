@@ -82,19 +82,13 @@ return {
 		dashboard.opts.layout[1].val = 0
 
 		if vim.o.filetype == "lazy" then
-			-- close and re-open Lazy after showing alpha
+			-- close and reopen Lazy after showing alpha
 			vim.notify("Missing plugins installed!", vim.log.levels.INFO, { title = "lazy.nvim" })
 			vim.cmd.close()
 			require("alpha").setup(dashboard.opts)
 			require("lazy").show()
 
-			local updates = require("lazy.status").updates()
-			if updates == false then
-				print("updates? " .. "nope")
-			elseif type(updates) == "string" then
-				print("updates? " .. updates)
-			end
-			print("updates? " .. "wtf")
+			-- local updates = require("lazy.status").updates()
 		else
 			require("alpha").setup(dashboard.opts)
 		end

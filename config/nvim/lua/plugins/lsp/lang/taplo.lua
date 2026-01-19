@@ -1,3 +1,5 @@
+--- **Taplo TOML Language Server**
+--- Language server for TOML files with schema validation and completion support.
 return {
 	keys = {
 		{

@@ -39,7 +39,6 @@ return {
 			"nvim-neotest/neotest-plenary",
 			"nvim-neotest/neotest-vim-test",
 			"marilari88/neotest-vitest",
-			"rouge8/neotest-rust",
 			"haydenmeade/neotest-jest",
 		},
 		config = function()
@@ -49,7 +48,6 @@ return {
 					require("neotest-vim-test")({
 						ignore_file_types = { "python", "vim", "lua" },
 					}),
-					require("neotest-rust"),
 					require("neotest-jest")({
 						jestCommand = "jest",
 						jestConfigFile = "jest.config.ts",

@@ -57,7 +57,25 @@ return {
 			"SmiteshP/nvim-navic",
 			"nvim-tree/nvim-web-devicons",
 		},
-		config = true,
+		opts = {
+			attach_navic = false, -- Disable auto-attach to avoid conflicts with rustaceanvim
+			create_autocmd = true, -- Auto-update winbar
+			-- Exclude certain filetypes if needed
+			exclude_filetypes = { "netrw", "toggleterm" },
+		},
+		config = function(_, opts)
+			-- Explicitly set up navic with auto-attach disabled
+			-- This prevents navic from creating its own LspAttach autocmd
+			local navic_ok, navic = pcall(require, "nvim-navic")
+			if navic_ok and navic then
+				navic.setup({
+					lsp = {
+						auto_attach = false, -- Disable auto-attach, we'll handle it manually
+					},
+				})
+			end
+			require("barbecue").setup(opts)
+		end,
 	},
 
 	{ import = "plugins.extras.lang" },
