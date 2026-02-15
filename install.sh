@@ -55,6 +55,16 @@ install_fnm() {
 install_node() {
   local version="$NODE_DEFAULT_VERSION"
 
+  if cmd_exists "node"; then
+    local current_major
+    current_major=$(node -v 2>/dev/null | sed 's/^v//; s/\..*//')
+    if [ -n "$current_major" ] && [ "$current_major" = "$NODE_DEFAULT_VERSION" ]; then
+      step_start "Installing node"
+      step_end 0 "node v$current_major already installed"
+      return 0
+    fi
+  fi
+
   if [ "$INTERACTIVE" = 1 ]; then
     local node_lts="" node_current=""
     local idx_json
@@ -89,18 +99,21 @@ install_node() {
   fi
 }
 
+# OCaml + opam: OCaml toolchain.
 install_ocaml() {
+  if cmd_exists "opam"; then
+    step_start "Installing ocaml/opam"
+    step_end 0 "ocaml and opam already installed"
+    return 0
+  fi
   confirm_optional "Install ocaml/opam?" "$DEFAULT_INSTALL_OCAML" || return 0
   # TODO install these independently
   step_start "Installing ocaml/opam"
-  if ! cmd_exists "opam"; then
-    run_with_spinner "Installing ocaml/opam" bash -c "brew install ocaml && brew install opam"
-    step_end $? "ocaml and opam installed"
-  else
-    step_end 0 "ocaml and opam already installed"
-  fi
+  run_with_spinner "Installing ocaml/opam" bash -c "brew install ocaml && brew install opam"
+  step_end $? "ocaml and opam installed"
 }
 
+# gh: GitHub CLI.
 install_gh() {
   step_start "Installing gh"
   if ! cmd_exists "gh"; then
@@ -194,14 +207,15 @@ install_fzf() {
 }
 
 install_ag() {
+  if cmd_exists "ag"; then
+    step_start "Installing the_silver_searcher (ag)"
+    step_end 0 "the_silver_searcher (ag) already installed"
+    return 0
+  fi
   confirm_optional "Install the_silver_searcher (ag)? (largely superseded by ripgrep)" "$DEFAULT_INSTALL_AG" || return 0
   step_start "Installing the_silver_searcher (ag)"
-  if ! cmd_exists "ag"; then
-    run_with_spinner "Installing the_silver_searcher (ag)" brew install the_silver_searcher
-    step_end $? "the_silver_searcher (ag) installed"
-  else
-    step_end 0 "the_silver_searcher (ag) already installed"
-  fi
+  run_with_spinner "Installing the_silver_searcher (ag)" brew install the_silver_searcher
+  step_end $? "the_silver_searcher (ag) installed"
 }
 
 install_ripgrep() {
@@ -214,55 +228,74 @@ install_ripgrep() {
   fi
 }
 
-# A simple, fast and user-friendly alternative to 'find'
-# https://github.com/sharkdp/fd
-install_fd() {
-  step_start "Installing fd"
-  if ! cmd_exists "fd"; then
-    run_with_spinner "Installing fd" brew install fd
-    step_end $? "fd installed"
+# jq: JSON processor for CLI.
+install_jq() {
+  step_start "Installing jq"
+  if ! cmd_exists "jq"; then
+    run_with_spinner "Installing jq" brew install jq
+    step_end $? "jq installed"
   else
-    step_end 0 "fd already installed"
+    step_end 0 "jq already installed"
   fi
+}
+
+# fd: fast find alternative.
+install_fd() {
+  if cmd_exists "fd"; then
+    step_start "Installing fd"
+    step_end 0 "fd already installed"
+    return 0
+  fi
+  confirm_optional "Install fd? (fast find alternative)" "$DEFAULT_INSTALL_FD" || return 0
+  step_start "Installing fd"
+  run_with_spinner "Installing fd" brew install fd
+  step_end $? "fd installed"
 }
 
 # Amethyst: tiling window manager for macOS.
 install_amethyst() {
+  if brew info amethyst &>/dev/null; then
+    step_start "Installing amethyst"
+    step_end 0 "amethyst already installed"
+    return 0
+  fi
   confirm_optional "Install amethyst? (tiling window manager)" "$DEFAULT_INSTALL_AMETHYST" || return 0
   step_start "Installing amethyst"
-  if ! brew info amethyst &>/dev/null; then
-    run_with_spinner "Installing amethyst" brew install amethyst
-    step_end $? "amethyst installed"
-  else
-    step_end 0 "amethyst already installed"
-  fi
+  run_with_spinner "Installing amethyst" brew install amethyst
+  step_end $? "amethyst installed"
 }
 
+# lazygit: TUI for git.
 install_lazygit() {
+  if brew info lazygit &>/dev/null; then
+    step_start "Installing lazygit"
+    step_end 0 "lazygit already installed"
+    return 0
+  fi
   confirm_optional "Install lazygit? (TUI for git, also from nvim)" "$DEFAULT_INSTALL_LAZYGIT" || return 0
   step_start "Installing lazygit"
-  if ! brew info lazygit &>/dev/null; then
-    run_with_spinner "Installing lazygit" bash -c "brew install jesseduffield/lazygit/lazygit && brew install lazygit"
-    step_end $? "lazygit installed"
-  else
-    step_end 0 "lazygit already installed"
-  fi
+  run_with_spinner "Installing lazygit" bash -c "brew install jesseduffield/lazygit/lazygit && brew install lazygit"
+  step_end $? "lazygit installed"
 }
 
+# Caskaydia Nerd Fonts. 2>&1 | cat so brew progress doesn't leak \r noise.
 install_fonts() {
   step_start "Installing Caskaydia nerdfonts"
-  run_with_spinner "Installing Caskaydia nerdfonts" bash -c "brew install homebrew/cask/font-caskaydia-cove-nerd-font && brew install homebrew/cask/font-caskaydia-mono-nerd-font"
+  run_with_spinner "Installing Caskaydia nerdfonts" bash -c "brew install --cask font-caskaydia-cove-nerd-font font-caskaydia-mono-nerd-font 2>&1 | cat"
   step_end $? "Caskaydia Cove and Mono nerdfonts installed"
 }
 
+# ChatGPT CLI. Prompts to add OPENAI_API_KEY to .zshrc.local if missing.
 install_chatgptcli() {
-  step_start "Installing chatgpt CLI"
-  if ! brew info chatgpt &>/dev/null; then
-    run_with_spinner "Installing chatgpt CLI" brew install j178/tap/chatgpt
-    step_end $? "chatgpt CLI installed"
-  else
+  if brew info chatgpt &>/dev/null; then
+    step_start "Installing chatgpt CLI"
     step_end 0 "chatgpt CLI already installed"
+    return 0
   fi
+  confirm_optional "Install ChatGPT CLI?" "$DEFAULT_INSTALL_CHATGPTCLI" || return 0
+  step_start "Installing chatgpt CLI"
+  run_with_spinner "Installing chatgpt CLI" brew install j178/tap/chatgpt
+  step_end $? "chatgpt CLI installed"
   if [ -f "$HOME/.zshrc.local" ] && ! grep -q OPENAI_API_KEY "$HOME/.zshrc.local" 2>/dev/null; then
     print_info "     Create chatgpt API key at https://platform.openai.com/account/api-keys"
     print_info "     # In ~/.zshrc.local"
@@ -273,14 +306,15 @@ install_chatgptcli() {
 
 # grc: generic colouriser.
 install_grc() {
+  if brew info grc &>/dev/null; then
+    step_start "Installing grc"
+    step_end 0 "grc already installed"
+    return 0
+  fi
   confirm_optional "Install grc? (generic colouriser)" "$DEFAULT_INSTALL_GRC" || return 0
   step_start "Installing grc"
-  if ! brew info grc &>/dev/null; then
-    run_with_spinner "Installing grc" brew install grc
-    step_end $? "grc installed"
-  else
-    step_end 0 "grc already installed"
-  fi
+  run_with_spinner "Installing grc" brew install grc
+  step_end $? "grc installed"
 }
 
 upgrade_casks() {
@@ -298,8 +332,10 @@ install_watchman
 # dev tools
 install_gh
 if [ "$INTERACTIVE" = 1 ] && cmd_exists "gh"; then
-  print_info "Run gh auth login to authenticate with GitHub"
-  gh auth login
+  if ! gh auth status &>/dev/null; then
+    print_info "Authenticate with GitHub"
+    gh auth login
+  fi
 fi
 install_gitdelta
 install_lazygit
