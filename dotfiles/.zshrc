@@ -7,7 +7,7 @@ export ZSH_THEME="theunraveler"
 # ENABLE_CORRECTION="true"
 export EDITOR="nvim"
 
-plugins+=(git nx-completion)
+plugins+=(git zsh-autosuggestions zsh-syntax-highlighting)
 source $ZSH/oh-my-zsh.sh
 
 
