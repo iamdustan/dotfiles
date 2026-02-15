@@ -2,44 +2,8 @@
 #
 # Setup a new machine!
 
-
-print_error() {
-    # Print output in red
-    printf "\e[0;31m  [✖] $1 $2\e[0m\n"
-}
-
-print_note() {
-    # Print output in dark gray
-    printf "\\e[90m $1 \\e[37m$2\e[0m\n"
-
-    # Print output in light gray
-    # printf "$1\e[0m\n"
-}
-
-print_info() {
-    # Print output in purple
-    printf "\e[0;35m $1\e[0m\n"
-}
-
-print_question() {
-    # Print output in yellow
-    printf "\e[0;33m  [?] $1\e[0m"
-}
-
-print_result() {
-    [ $1 -eq 0 ] \
-        && print_success "$2" \
-        || print_error "$2"
-
-    [ "$3" == "true" ] && [ $1 -ne 0 ] \
-        && exit
-}
-
-print_success() {
-    # Print output in green
-    printf "\e[0;32m   [✔] $1\e[0m\n"
-}
-
+SETUP_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SETUP_ROOT/setup-common.sh" "$@"
 
 # setup vim/neovim
 setup_nvim() {

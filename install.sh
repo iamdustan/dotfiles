@@ -2,46 +2,8 @@
 #
 # Install sheesh
 
-print_error() {
-    # Print output in red
-    printf "\e[0;31m  [✖] $1 $2\e[0m\n"
-}
-
-print_info() {
-    # Print output in purple
-    printf "\e[0;35m $1\e[0m\n"
-}
-
-print_question() {
-    # Print output in yellow
-    printf "\e[0;33m  [?] $1\e[0m"
-}
-
-print_result() {
-    [ $1 -eq 0 ] \
-        && print_success "$2" \
-        || print_error "$2"
-
-    [ "$3" == "true" ] && [ $1 -ne 0 ] \
-        && exit
-}
-
-print_success() {
-    # Print output in green
-    printf "\e[0;32m  [✔] $1\e[0m\n"
-}
-
-cmd_exists() {
-    [ -x "$(command -v "$1")" ] \
-        && return 0 \
-        || return 1
-}
-
-file_exists() {
-    [ -d $1 ] \
-        && return 0 \
-        || return 1
-}
+SETUP_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SETUP_ROOT/setup-common.sh" "$@"
 
 install_homebrew() {
   if ! cmd_exists "brew"
