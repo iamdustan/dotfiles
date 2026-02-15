@@ -25,41 +25,50 @@ FILES_TO_SYMLINK="$FILES_TO_SYMLINK bin" # add in vim and the binaries
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 main() {
-
     local i=""
     local sourceFile=""
     local targetFile=""
+    local code=0
+
+    if [ "$PLAIN" = 1 ]; then
+        print_info "Symlinking dotfiles"
+    else
+        step_start "Symlinking dotfiles"
+    fi
 
     for i in ${FILES_TO_SYMLINK[@]}; do
-
         sourceFile="$(pwd)/$i"
         targetFile="$HOME/$(printf "%s" "$i" | sed "s/.*\/\(.*\)/\1/g")"
 
         if [ -e "$targetFile" ]; then
             if [ "$(readlink "$targetFile")" != "$sourceFile" ]; then
-
                 ask_for_confirmation "'$targetFile' already exists, do you want to overwrite it?"
                 if answer_is_yes; then
                     rm -rf "$targetFile"
-                    execute "ln -fs $sourceFile $targetFile" "$targetFile → $sourceFile"
+                    ln -fs "$sourceFile" "$targetFile" &>/dev/null
+                    code=$?
+                    when_plain print_result $code "$targetFile → $sourceFile"
                 else
-                    print_error "$targetFile → $sourceFile"
+                    when_plain print_error "$targetFile → $sourceFile"
+                    code=1
                 fi
-
             else
-                print_success "$targetFile → $sourceFile"
+                code=0
+                when_plain print_success "$targetFile → $sourceFile"
             fi
         else
-            execute "ln -fs $sourceFile $targetFile" "$targetFile → $sourceFile"
+            ln -fs "$sourceFile" "$targetFile" &>/dev/null
+            code=$?
+            when_plain print_result $code "$targetFile → $sourceFile"
         fi
-
     done
 
+    if [ "$PLAIN" = 1 ]; then
+        print_info "  Finished symlinking dotfiles"
+    else
+        step_end $code "Finished symlinking dotfiles"
+    fi
 }
 
-print_info "Symlinking dotfiles"
-
 main
-
-print_info "  Finished symlinking dotfiles"
 

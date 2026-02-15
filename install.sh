@@ -6,228 +6,218 @@ SETUP_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SETUP_ROOT/setup-common.sh" "$@"
 
 install_homebrew() {
-  if ! cmd_exists "brew"
-  then
-    /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-    print_success "homebrew installed"
+  step_start "Installing homebrew"
+  if ! cmd_exists "brew"; then
+    run_with_spinner "Installing homebrew" /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+    step_end $? "homebrew installed"
   else
-    print_success "homebrew already installed"
+    step_end 0 "homebrew already installed"
   fi
 }
 
 install_watchman() {
-  if ! cmd_exists "watchman"
-  then
-    brew install watchman
-    print_success "watchman installed"
+  step_start "Installing watchman"
+  if ! cmd_exists "watchman"; then
+    run_with_spinner "Installing watchman" brew install watchman
+    step_end $? "watchman installed"
   else
-    print_success "watchman already installed"
+    step_end 0 "watchman already installed"
   fi
 }
 
 install_fnm() {
-  if ! cmd_exists "fnm"
-  then
-    if file_exists "$HOME/.fnm"
-    then
-      brew install Schniz/tap/fnm
-      print_success "fnm installed"
+  step_start "Installing fnm"
+  if ! cmd_exists "fnm"; then
+    if file_exists "$HOME/.fnm"; then
+      run_with_spinner "Installing fnm" brew install Schniz/tap/fnm
+      step_end $? "fnm installed"
     else
-      print_success "fnm already installed"
+      step_end 0 "fnm already installed"
     fi
+  else
+    step_end 0 "fnm already installed"
   fi
 }
 
 install_node() {
-  if ! cmd_exists "node"
-  then
-    fnm install v20 &>/dev/null
-    print_success "node v20.x.x installed"
+  step_start "Installing node"
+  if ! cmd_exists "node"; then
+    run_with_spinner "Installing node" fnm install v20
+    step_end $? "node v20.x.x installed"
   else
-    print_success "node v20.x.x already installed"
+    step_end 0 "node v20.x.x already installed"
   fi
 }
 
 install_ocaml() {
   # TODO install these independently
-  if ! cmd_exists "opam"
-  then
-    brew install ocaml &>/dev/null
-    print_success "ocaml installed"
-
-    brew install opam &>/dev/null
-    print_success "opam installed"
+  step_start "Installing ocaml/opam"
+  if ! cmd_exists "opam"; then
+    run_with_spinner "Installing ocaml/opam" bash -c "brew install ocaml && brew install opam"
+    step_end $? "ocaml and opam installed"
   else
-    print_success "ocaml already installed"
-    print_success "opam already installed"
+    step_end 0 "ocaml and opam already installed"
   fi
-
 }
 
 install_gh() {
-  if ! cmd_exists "gh"
-  then
-    brew install gh &>/dev/null
-    print_success "gh installed"
+  step_start "Installing gh"
+  if ! cmd_exists "gh"; then
+    run_with_spinner "Installing gh" brew install gh
+    step_end $? "gh installed"
   else
-    print_success "gh already installed"
+    step_end 0 "gh already installed"
   fi
 }
+
 install_gitdelta() {
-  if ! brew list git-delta >/dev/null 2>&1
-  then
-    brew install git-delta &>/dev/null
-    print_success "git-delta installed"
+  step_start "Installing git-delta"
+  if ! brew list git-delta >/dev/null 2>&1; then
+    run_with_spinner "Installing git-delta" brew install git-delta
+    step_end $? "git-delta installed"
   else
-    print_success "git-delta already installed"
+    step_end 0 "git-delta already installed"
   fi
 }
 
 
 install_rustup() {
-  if ! cmd_exists "cargo"
-  then
-    curl https://sh.rustup.rs -sSf | sh
-    print_success "cargo installed"
+  step_start "Installing rustup/cargo"
+  if ! cmd_exists "cargo"; then
+    run_with_spinner "Installing rustup/cargo" bash -c "curl https://sh.rustup.rs -sSf | sh"
+    step_end $? "cargo installed"
   else
-    print_success "cargo already installed"
+    step_end 0 "cargo already installed"
   fi
 }
 
 # OpenGL terminal emulator
 # https://github.com/alacritty/alacritty
 install_alacritty() {
-  if ! brew cask info alacritty &>/dev/null;
-  then
-    brew cask install alacritty
-    sudo tic -xe alacritty,alacritty-direct extra/alacritty.info
-    print_success "alacritty installed"
+  step_start "Installing alacritty"
+  if ! brew cask info alacritty &>/dev/null; then
+    run_with_spinner "Installing alacritty" bash -c "brew cask install alacritty && sudo tic -xe alacritty,alacritty-direct extra/alacritty.info"
+    step_end $? "alacritty installed"
   else
-    print_success "alacritty already installed"
+    step_end 0 "alacritty already installed"
   fi
 }
 
 # vim for the modern era
 # https://neovim.io/
 install_neovim() {
-  if ! cmd_exists "nvim"
-  then
-    brew install neovim/neovim/neovim
-    print_success "neovim (nvim) installed"
+  step_start "Installing neovim"
+  if ! cmd_exists "nvim"; then
+    run_with_spinner "Installing neovim" brew install neovim/neovim/neovim
+    step_end $? "neovim (nvim) installed"
   else
-    print_success "neovim already installed"
+    step_end 0 "neovim already installed"
   fi
 }
 
 # terminal multiplexer
 # https://github.com/tmux/tmux/wiki
 install_tmux() {
-  if ! cmd_exists "tmux"
-  then
-    brew install tmux
-    print_success "tmux installed"
+  step_start "Installing tmux"
+  if ! cmd_exists "tmux"; then
+    run_with_spinner "Installing tmux" brew install tmux
+    step_end $? "tmux installed"
   else
-    print_success "tmux already installed"
+    step_end 0 "tmux already installed"
   fi
 }
 
 # zsh / ohmyzsh is an interactive shell
 # https://ohmyz.sh/
 install_zsh() {
-  if file_exists $HOME/.zshrc
-  then
-    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-    print_success "zsh installed"
+  step_start "Installing zsh/oh-my-zsh"
+  if file_exists "$HOME/.zshrc"; then
+    run_with_spinner "Installing zsh/oh-my-zsh" sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+    step_end $? "zsh installed"
   else
-    print_success "zsh already installed"
+    step_end 0 "zsh already installed"
   fi
 }
 
 # fzf is a general-purpose command-line fuzzy finder.
 # https://github.com/junegunn/fzf
 install_fzf() {
-  if ! cmd_exists "fzf"
-  then
-    brew install fzf
-    print_success "fzf (ag) installed"
+  step_start "Installing fzf"
+  if ! cmd_exists "fzf"; then
+    run_with_spinner "Installing fzf" brew install fzf
+    step_end $? "fzf installed"
   else
-    print_success "fzf (ag) already installed"
+    step_end 0 "fzf already installed"
   fi
 }
 
 install_ag() {
-  if ! cmd_exists "ag"
-  then
-    brew install the_silver_searcher
-    print_success "the_silver_searcher (ag) installed"
+  step_start "Installing the_silver_searcher (ag)"
+  if ! cmd_exists "ag"; then
+    run_with_spinner "Installing the_silver_searcher (ag)" brew install the_silver_searcher
+    step_end $? "the_silver_searcher (ag) installed"
   else
-    print_success "the_silver_searcher (ag) already installed"
+    step_end 0 "the_silver_searcher (ag) already installed"
   fi
 }
 
 install_ripgrep() {
-  if ! cmd_exists "rg"
-  then
-    brew install  ripgrep
-    print_success "ripgrep (rg) installed"
+  step_start "Installing ripgrep"
+  if ! cmd_exists "rg"; then
+    run_with_spinner "Installing ripgrep" brew install ripgrep
+    step_end $? "ripgrep (rg) installed"
   else
-    print_success "ripgrep (rg) already installed"
+    step_end 0 "ripgrep (rg) already installed"
   fi
 }
 
-# A simple, fast and user-friendly alternative to 'find' 
+# A simple, fast and user-friendly alternative to 'find'
 # https://github.com/sharkdp/fd
 install_fd() {
-  if ! cmd_exists "fd"
-  then
-    brew install fd
-    print_success "fd installed"
+  step_start "Installing fd"
+  if ! cmd_exists "fd"; then
+    run_with_spinner "Installing fd" brew install fd
+    step_end $? "fd installed"
   else
-    print_success "fd already installed"
+    step_end 0 "fd already installed"
   fi
 }
 
 install_amethyst() {
-  if ! brew info amethyst &>/dev/null;
-  then
-    brew install amethyst
-    print_success "amethyst installed"
+  step_start "Installing amethyst"
+  if ! brew info amethyst &>/dev/null; then
+    run_with_spinner "Installing amethyst" brew install amethyst
+    step_end $? "amethyst installed"
   else
-    print_success "amethyst already installed"
+    step_end 0 "amethyst already installed"
   fi
 }
 
 install_lazygit() {
-  if ! brew info lazygit &>/dev/null;
-  then
-    brew install jesseduffield/lazygit/lazygit
-    brew install lazygit
-    print_success "lazygit installed"
+  step_start "Installing lazygit"
+  if ! brew info lazygit &>/dev/null; then
+    run_with_spinner "Installing lazygit" bash -c "brew install jesseduffield/lazygit/lazygit && brew install lazygit"
+    step_end $? "lazygit installed"
   else
-    print_success "lazygit already installed"
+    step_end 0 "lazygit already installed"
   fi
 }
 
 install_fonts() {
-  brew install homebrew/cask/font-caskaydia-cove-nerd-font
-  brew install homebrew/cask/font-caskaydia-mono-nerd-font
-
-  # brew install font-caskaydia-cove-nerd-font
-  # brew install font-caskaydia-mono-nerd-font
-  print_success "Caskaydia Cove and Mono nerdfonts installed"
+  step_start "Installing Caskaydia nerdfonts"
+  run_with_spinner "Installing Caskaydia nerdfonts" bash -c "brew install homebrew/cask/font-caskaydia-cove-nerd-font && brew install homebrew/cask/font-caskaydia-mono-nerd-font"
+  step_end $? "Caskaydia Cove and Mono nerdfonts installed"
 }
 
 install_chatgptcli() {
-  if ! brew info chatgpt &>/dev/null;
-  then
-    # https://github.com/j178/chatgpt
-    brew install j178/tap/chatgpt
-    print_success "lazygit installed"
+  step_start "Installing chatgpt CLI"
+  if ! brew info chatgpt &>/dev/null; then
+    run_with_spinner "Installing chatgpt CLI" brew install j178/tap/chatgpt
+    step_end $? "chatgpt CLI installed"
   else
-    print_success "lazygit already installed"
+    step_end 0 "chatgpt CLI already installed"
   fi
-  # Remind to add API key if necessary
-  if grep -q OPEN_API_KEY "$HOME/.zshrc.local"; then
+  if [ -f "$HOME/.zshrc.local" ] && ! grep -q OPENAI_API_KEY "$HOME/.zshrc.local" 2>/dev/null; then
     print_info "     Create chatgpt API key at https://platform.openai.com/account/api-keys"
     print_info "     # In ~/.zshrc.local"
     print_info "     export OPENAI_API_KEY=xxx"
@@ -236,13 +226,12 @@ install_chatgptcli() {
 
 
 install_grc() {
-  if ! brew info grc &>/dev/null;
-  then
-    # git submodule update --init --recursive
-    brew install grc
-    print_success "grc installed"
+  step_start "Installing grc"
+  if ! brew info grc &>/dev/null; then
+    run_with_spinner "Installing grc" brew install grc
+    step_end $? "grc installed"
   else
-    print_success "grc already installed"
+    step_end 0 "grc already installed"
   fi
 }
 

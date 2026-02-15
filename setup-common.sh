@@ -13,22 +13,22 @@ for _arg in "$@"; do
   case "$_arg" in
     -i|--interactive) INTERACTIVE=1 ;;
     -v|--verbose)     VERBOSE=1 ;;
-    -p|--plain)        PLAIN=1 ;;
+    -p|--plain)       PLAIN=1 ;;
   esac
 done
 
 # --- Print helpers ---
 
 print_error() {
-  printf "\e[0;31m  [✖] $1 $2\e[0m\n"
+  printf '\033[0;31m ✗ %s\033[0m\n' "$1"
 }
 
 print_info() {
-  printf "\e[0;35m $1\e[0m\n"
+  printf '\033[0;35m %s\033[0m\n' "$1"
 }
 
 print_question() {
-  printf "\e[0;33m  [?] $1\e[0m"
+  printf '\033[0;33m  [?] %s\033[0m' "$1"
 }
 
 print_result() {
@@ -39,11 +39,80 @@ print_result() {
 }
 
 print_success() {
-  printf "\e[0;32m  [✔] $1\e[0m\n"
+  printf '\033[0;32m ✓ %s\033[0m\n' "$1"
 }
 
 print_note() {
-  printf "\\e[90m $1 \\e[37m$2\e[0m\n"
+  printf '\033[90m %s \033[37m%s\033[0m\n' "$1" "$2"
+}
+
+# Step result: same format as print_success/print_error; collapsed mode clears the line first.
+print_step_ok() {
+  [ "$PLAIN" = 0 ] && printf '\r\033[K'
+  print_success "$1"
+}
+print_step_fail() {
+  [ "$PLAIN" = 0 ] && printf '\r\033[K'
+  print_error "$1"
+}
+
+# --- Step helpers (for inline/collapsed output when PLAIN=0) ---
+
+# Spinner frames (single-width) and dots (dim → bright wave)
+STEP_SPINNER=('◐' '◓' '◑' '◒')
+STEP_DOTS=(
+  $'\033[90m.\033[0m\033[90m.\033[0m\033[90m.\033[0m'
+  $'\033[90m.\033[0m\033[90m.\033[0m.'
+  $'\033[90m.\033[0m.\033[90m.\033[0m'
+  $'.\033[90m.\033[0m\033[90m.\033[0m'
+)
+
+# Start a step: in plain mode no-op; otherwise show spinner + message + animated dots (one frame, no newline).
+# Pass message without "..." (e.g. "Installing homebrew"); we add the dots.
+step_start() {
+  if [ "$PLAIN" = 1 ]; then
+    :
+  else
+    printf '\r\033[K %s %s %s' "${STEP_SPINNER[0]}" "$1" "${STEP_DOTS[0]}"
+  fi
+}
+
+# End a step: exit_code (0 = success), then message.
+step_end() {
+  local code=$1
+  local msg=$2
+  if [ "$code" -eq 0 ]; then
+    print_step_ok "$msg"
+  else
+    print_step_fail "$msg"
+  fi
+}
+
+# Run command in background and animate spinner + dots on the same line until it finishes. Use for long-running installs.
+# Usage: run_with_spinner "Installing homebrew" /usr/bin/ruby -e "..." ; step_end $? "homebrew installed"
+run_with_spinner() {
+  local msg=$1
+  shift
+  if [ "$PLAIN" = 1 ]; then
+    "$@"
+    return $?
+  fi
+  ("$@" &>/dev/null) &
+  local pid=$!
+  local sp=0 dot=0
+  while kill -0 "$pid" 2>/dev/null; do
+    printf '\r\033[K %s %s %s' "${STEP_SPINNER[sp]}" "$msg" "${STEP_DOTS[dot]}"
+    sp=$(( (sp + 1) % ${#STEP_SPINNER[@]} ))
+    dot=$(( (dot + 1) % ${#STEP_DOTS[@]} ))
+    sleep 0.10
+  done
+  wait "$pid"
+  return $?
+}
+
+# Run command only when PLAIN=1 (reduces repeated [ "$PLAIN" = 1 ] checks).
+when_plain() {
+  [ "$PLAIN" = 1 ] && "$@"
 }
 
 # --- Shared helpers ---
@@ -72,39 +141,6 @@ ask_for_confirmation() {
   printf "\n"
 }
 
-ask_for_sudo() {
-  sudo -v
-  while true; do
-    sudo -n true
-    sleep 60
-    kill -0 "$$" || exit
-  done &> /dev/null &
-}
-
-execute() {
-  $1 &> /dev/null
-  print_result $? "${2:-$1}"
-}
-
-get_answer() {
-  printf "%s" "${REPLY:-}"
-}
-
-get_os() {
-  declare -r OS_NAME="$(uname -s)"
-  local os=""
-  if [ "$OS_NAME" = "Darwin" ]; then
-    os="osx"
-  elif [ "$OS_NAME" = "Linux" ] && [ -e "/etc/lsb-release" ]; then
-    os="ubuntu"
-  fi
-  printf "%s" "$os"
-}
-
-is_git_repository() {
-  [ "$(git rev-parse &>/dev/null; printf $?)" -eq 0 ] && return 0 || return 1
-}
-
 mkd() {
   if [ -n "$1" ]; then
     if [ -e "$1" ]; then
@@ -114,7 +150,8 @@ mkd() {
         print_success "$1"
       fi
     else
-      execute "mkdir -p $1" "$1"
+      mkdir -p "$1" &>/dev/null
+      print_result $? "$1"
     fi
   fi
 }
