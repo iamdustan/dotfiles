@@ -7,8 +7,8 @@ source "$SETUP_ROOT/setup-common.sh" "$@"
 
 # setup vim/neovim
 setup_nvim() {
-  mkdir ~/.config > /dev/null 2>&1
-  ln -fs "$(pwd)/config/nvim" ~/.config/nvim
+  mkdir -p ~/.config 2>/dev/null
+  ln -fs "$SETUP_ROOT/config/nvim" ~/.config/nvim
   when_plain print_success "nvim configured"
 }
 # setup zsh
@@ -29,9 +29,9 @@ setup_osx() {
 }
 
 setup_alacritty() {
-  mkdir ~/.config > /dev/null 2>&1
-  git submodule update --init --recursive > /dev/null 2>&1
-  ln -fs "$(pwd)/config/alacritty" ~/.config/alacritty
+  mkdir -p ~/.config 2>/dev/null
+  (cd "$SETUP_ROOT" && git submodule update --init --recursive config/alacritty 2>/dev/null) || true
+  ln -fs "$SETUP_ROOT/config/alacritty" ~/.config/alacritty
   when_plain print_success "alacritty configured"
 }
 

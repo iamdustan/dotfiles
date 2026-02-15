@@ -1,18 +1,13 @@
 #!/bin/bash
-#
 # Shared flags and helpers for setup scripts.
 # Source with: source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/setup-common.sh" "$@"
-#
 
-# Parse -i/--interactive, -v/--verbose, -p/--plain from "$@" (no shift so caller's "$@" is unchanged)
-# Not exported so we don't override VERBOSE/INTERACTIVE used by other tools.
+# Parse -i/--interactive, -p/--plain from "$@" (no shift so caller's "$@" is unchanged)
 INTERACTIVE=0
-VERBOSE=0
 PLAIN=0
 for _arg in "$@"; do
   case "$_arg" in
     -i|--interactive) INTERACTIVE=1 ;;
-    -v|--verbose)     VERBOSE=1 ;;
     -p|--plain)       PLAIN=1 ;;
   esac
 done
@@ -46,7 +41,28 @@ print_note() {
   printf '\033[90m %s \033[37m%s\033[0m\n' "$1" "$2"
 }
 
-# Step result: same format as print_success/print_error; collapsed mode clears the line first.
+# Optional-step helper: when INTERACTIVE=1, prompt (y/n); when not, use default.
+# Usage: confirm_optional "Install Amethyst? [y/N]" "no"  → returns 0 (yes) or 1 (no/skip).
+# Default must be "yes" or "no". Returns 0 to proceed, 1 to skip.
+confirm_optional() {
+  local prompt="$1"
+  local default="${2:-no}"
+  if [ "$INTERACTIVE" = 1 ]; then
+    if [ "$default" = "yes" ]; then
+      print_question "$prompt [Y/n] "
+    else
+      print_question "$prompt [y/N] "
+    fi
+    read -n 1 -r
+    printf "\n"
+    if [[ "${REPLY:-}" =~ ^[Yy]$ ]]; then return 0; fi
+    if [[ "${REPLY:-}" =~ ^[Nn]$ ]]; then return 1; fi
+    [ "$default" = "yes" ] && return 0 || return 1
+  fi
+  [ "$default" = "yes" ] && return 0 || return 1
+}
+
+# When PLAIN=0, clear the current line before printing so one line updates in place.
 print_step_ok() {
   [ "$PLAIN" = 0 ] && printf '\r\033[K'
   print_success "$1"
@@ -56,9 +72,8 @@ print_step_fail() {
   print_error "$1"
 }
 
-# --- Step helpers (for inline/collapsed output when PLAIN=0) ---
+# --- Step helpers (inline output when PLAIN=0) ---
 
-# Spinner frames (single-width) and dots (dim → bright wave)
 STEP_SPINNER=('◐' '◓' '◑' '◒')
 STEP_DOTS=(
   $'\033[90m.\033[0m\033[90m.\033[0m\033[90m.\033[0m'
@@ -67,8 +82,7 @@ STEP_DOTS=(
   $'.\033[90m.\033[0m\033[90m.\033[0m'
 )
 
-# Start a step: in plain mode no-op; otherwise show spinner + message + animated dots (one frame, no newline).
-# Pass message without "..." (e.g. "Installing homebrew"); we add the dots.
+# PLAIN=1: no-op. Otherwise: one line with spinner + message (no newline).
 step_start() {
   if [ "$PLAIN" = 1 ]; then
     :
@@ -77,7 +91,6 @@ step_start() {
   fi
 }
 
-# End a step: exit_code (0 = success), then message.
 step_end() {
   local code=$1
   local msg=$2
@@ -88,8 +101,7 @@ step_end() {
   fi
 }
 
-# Run command in background and animate spinner + dots on the same line until it finishes. Use for long-running installs.
-# Usage: run_with_spinner "Installing homebrew" /usr/bin/ruby -e "..." ; step_end $? "homebrew installed"
+# Long-running command: when PLAIN=0 run in background and animate spinner on one line; when PLAIN=1 run in foreground.
 run_with_spinner() {
   local msg=$1
   shift
@@ -110,7 +122,6 @@ run_with_spinner() {
   return $?
 }
 
-# Run command only when PLAIN=1 (reduces repeated [ "$PLAIN" = 1 ] checks).
 when_plain() {
   [ "$PLAIN" = 1 ] && "$@"
 }
@@ -125,7 +136,6 @@ file_exists() {
   [ -d "$1" ] && return 0 || return 1
 }
 
-# Used by setup-dotfiles
 answer_is_yes() {
   [[ "${REPLY:-}" =~ ^[Yy]$ ]] && return 0 || return 1
 }

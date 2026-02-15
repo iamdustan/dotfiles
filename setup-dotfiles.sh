@@ -1,24 +1,11 @@
 #!/bin/bash
 #
-# Symlink dotfiles
-# this symlinks all the dotfiles (and .vim/) to ~/
-# it also symlinks ~/bin for easy updating
-#
-# this is safe to run multiple times and will prompt you about anything unclear
-
-# sources:
-#   https://github.com/paulirish/dotfiles/blob/master/symlink-setup.sh
-#   https://raw.githubusercontent.com/alrra/dotfiles/master/os/create_symbolic_links.sh
+# Symlink dotfiles and bin to ~. Safe to run multiple times; prompts on overwrite.
 
 SETUP_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SETUP_ROOT/setup-common.sh" "$@"
 
-#
-# actual symlink stuff
-#
-
-# Symlink line: target (bright gray) ← source (dark gray).
-# code 0 = ✓ green, else ✗ red.
+# When PLAIN=0, clear line before printing (same as print_step_ok).
 print_symlink_result() {
   local code=$1 target=$2 source=$3
   [ "$PLAIN" = 0 ] && printf '\r\033[K'
@@ -29,13 +16,8 @@ print_symlink_result() {
   fi
 }
 
-
-# finds all .dotfiles in this folder
 declare -a FILES_TO_SYMLINK=$(find dotfiles -type f -name ".*" -not -name .DS_Store -not -name .git -not -name .osx | sed -e 's|//|/|')
-# | sed -e 's|./.|.|')
-FILES_TO_SYMLINK="$FILES_TO_SYMLINK bin" # add in vim and the binaries
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+FILES_TO_SYMLINK="$FILES_TO_SYMLINK bin"
 
 main() {
     local i=""

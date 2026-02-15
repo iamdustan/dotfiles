@@ -5,6 +5,19 @@
 SETUP_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SETUP_ROOT/setup-common.sh" "$@"
 
+# Defaults for optional steps when not -i. Change here to update behavior everywhere.
+DEFAULT_INSTALL_LAZYGIT="yes"
+DEFAULT_INSTALL_FD="yes"
+DEFAULT_INSTALL_GRC="no"
+DEFAULT_INSTALL_RUSTUP="yes"
+DEFAULT_INSTALL_CHATGPTCLI="no"
+DEFAULT_INSTALL_ALACRITTY="yes"
+DEFAULT_INSTALL_OCAML="no"
+DEFAULT_INSTALL_AG="no"
+DEFAULT_INSTALL_AMETHYST="no"
+
+NODE_DEFAULT_VERSION=24
+
 install_homebrew() {
   step_start "Installing homebrew"
   if ! cmd_exists "brew"; then
@@ -40,16 +53,44 @@ install_fnm() {
 }
 
 install_node() {
+  local version="$NODE_DEFAULT_VERSION"
+
+  if [ "$INTERACTIVE" = 1 ]; then
+    local node_lts="" node_current=""
+    local idx_json
+    idx_json=$(curl -sL https://nodejs.org/dist/index.json 2>/dev/null)
+    if [ -n "$idx_json" ] && cmd_exists "jq"; then
+      node_lts=$(printf '%s' "$idx_json" | jq -r '[.[] | select(.lts) | .version] | first // empty' 2>/dev/null)
+      node_current=$(printf '%s' "$idx_json" | jq -r '[.[] | select((.version | split(".")[0] | ltrimstr("v") | tonumber) % 2 == 0) | .version] | first // empty' 2>/dev/null)
+    fi
+
+    if [ -n "$node_lts" ] && [ -n "$node_current" ]; then
+      print_question "Node version to install? (Latest LTS: $node_lts, Latest current: $node_current) [$NODE_DEFAULT_VERSION] "
+    else
+      print_question "Node version to install? [$NODE_DEFAULT_VERSION] "
+    fi
+    read -r
+    if [ -n "${REPLY:-}" ]; then
+      version="${REPLY#v}"
+      version="${version%%[^0-9]*}"
+      [ -z "$version" ] && version="$NODE_DEFAULT_VERSION"
+      if [ "$version" != "$NODE_DEFAULT_VERSION" ]; then
+        sed -i.bak "s/^NODE_DEFAULT_VERSION=.*/NODE_DEFAULT_VERSION=$version/" "$SETUP_ROOT/install.sh" 2>/dev/null && rm -f "$SETUP_ROOT/install.sh.bak"
+      fi
+    fi
+  fi
+
   step_start "Installing node"
   if ! cmd_exists "node"; then
-    run_with_spinner "Installing node" fnm install v20
-    step_end $? "node v20.x.x installed"
+    run_with_spinner "Installing node" fnm install "v$version"
+    step_end $? "node v$version installed"
   else
-    step_end 0 "node v20.x.x already installed"
+    step_end 0 "node v$version already installed"
   fi
 }
 
 install_ocaml() {
+  confirm_optional "Install ocaml/opam?" "$DEFAULT_INSTALL_OCAML" || return 0
   # TODO install these independently
   step_start "Installing ocaml/opam"
   if ! cmd_exists "opam"; then
@@ -70,6 +111,7 @@ install_gh() {
   fi
 }
 
+# git-delta: Git diff pager with syntax highlighting.
 install_gitdelta() {
   step_start "Installing git-delta"
   if ! brew list git-delta >/dev/null 2>&1; then
@@ -152,6 +194,7 @@ install_fzf() {
 }
 
 install_ag() {
+  confirm_optional "Install the_silver_searcher (ag)? (largely superseded by ripgrep)" "$DEFAULT_INSTALL_AG" || return 0
   step_start "Installing the_silver_searcher (ag)"
   if ! cmd_exists "ag"; then
     run_with_spinner "Installing the_silver_searcher (ag)" brew install the_silver_searcher
@@ -183,7 +226,9 @@ install_fd() {
   fi
 }
 
+# Amethyst: tiling window manager for macOS.
 install_amethyst() {
+  confirm_optional "Install amethyst? (tiling window manager)" "$DEFAULT_INSTALL_AMETHYST" || return 0
   step_start "Installing amethyst"
   if ! brew info amethyst &>/dev/null; then
     run_with_spinner "Installing amethyst" brew install amethyst
@@ -194,6 +239,7 @@ install_amethyst() {
 }
 
 install_lazygit() {
+  confirm_optional "Install lazygit? (TUI for git, also from nvim)" "$DEFAULT_INSTALL_LAZYGIT" || return 0
   step_start "Installing lazygit"
   if ! brew info lazygit &>/dev/null; then
     run_with_spinner "Installing lazygit" bash -c "brew install jesseduffield/lazygit/lazygit && brew install lazygit"
@@ -225,7 +271,9 @@ install_chatgptcli() {
 }
 
 
+# grc: generic colouriser.
 install_grc() {
+  confirm_optional "Install grc? (generic colouriser)" "$DEFAULT_INSTALL_GRC" || return 0
   step_start "Installing grc"
   if ! brew info grc &>/dev/null; then
     run_with_spinner "Installing grc" brew install grc
@@ -249,34 +297,32 @@ install_watchman
 
 # dev tools
 install_gh
+if [ "$INTERACTIVE" = 1 ] && cmd_exists "gh"; then
+  print_info "Run gh auth login to authenticate with GitHub"
+  gh auth login
+fi
 install_gitdelta
 install_lazygit
 install_fonts
 install_neovim
 install_tmux
 install_ripgrep
-install_fzf # fuzzy finder
-install_fd # better `find`
+install_jq
+install_fzf
+install_fd
 install_zsh
 install_grc
-# install_chatgptcli
-# install_alacritty # I usually building alacritty from source weekly.
+install_chatgptcli
+install_alacritty
+install_ocaml
+install_ag
+install_amethyst
 
 # programming languages
 install_fnm
 install_rustup
 install_node
 
-
-# upgrade_casks
-# dustandeprecated: things I don’t use anymore
-# install_ocaml # reasonml had a day
-# install_ag # replaced by ripgrep
-# install_amethyst # I don’t like this window manager
-# install_hub
-
-print_info "Remember to build alacritty from source"
-print_info "  git clone git@github.com:alacritty/alacritty.git && cd alacritty && make app"
 print_info "  Finished installing base applications"
 # TODO: set up a cronjob on your computer for this
 
