@@ -17,6 +17,19 @@ source "$SETUP_ROOT/setup-common.sh" "$@"
 # actual symlink stuff
 #
 
+# Symlink line: target (bright gray) ← source (dark gray).
+# code 0 = ✓ green, else ✗ red.
+print_symlink_result() {
+  local code=$1 target=$2 source=$3
+  [ "$PLAIN" = 0 ] && printf '\r\033[K'
+  if [ "$code" -eq 0 ]; then
+    printf '\033[0;32m ✓ \033[97m%s\033[0m ← \033[90m%s\033[0m\n' "$target" "$source"
+  else
+    printf '\033[0;31m ✗ \033[97m%s\033[0m ← \033[90m%s\033[0m\n' "$target" "$source"
+  fi
+}
+
+
 # finds all .dotfiles in this folder
 declare -a FILES_TO_SYMLINK=$(find dotfiles -type f -name ".*" -not -name .DS_Store -not -name .git -not -name .osx | sed -e 's|//|/|')
 # | sed -e 's|./.|.|')
@@ -34,32 +47,35 @@ main() {
         print_info "Symlinking dotfiles"
     else
         step_start "Symlinking dotfiles"
+        printf "\n"
     fi
 
     for i in ${FILES_TO_SYMLINK[@]}; do
         sourceFile="$(pwd)/$i"
         targetFile="$HOME/$(printf "%s" "$i" | sed "s/.*\/\(.*\)/\1/g")"
+        displayTarget="${targetFile/#$HOME/~}"
+        displaySource="${sourceFile/#$HOME/~}"
 
         if [ -e "$targetFile" ]; then
             if [ "$(readlink "$targetFile")" != "$sourceFile" ]; then
-                ask_for_confirmation "'$targetFile' already exists, do you want to overwrite it?"
+                ask_for_confirmation "'$displayTarget' already exists, do you want to overwrite it?"
                 if answer_is_yes; then
                     rm -rf "$targetFile"
                     ln -fs "$sourceFile" "$targetFile" &>/dev/null
                     code=$?
-                    when_plain print_result $code "$targetFile → $sourceFile"
+                    print_symlink_result $code "$displayTarget" "$displaySource"
                 else
-                    when_plain print_error "$targetFile → $sourceFile"
+                    print_symlink_result 1 "$displayTarget" "$displaySource"
                     code=1
                 fi
             else
                 code=0
-                when_plain print_success "$targetFile → $sourceFile"
+                print_symlink_result 0 "$displayTarget" "$displaySource"
             fi
         else
             ln -fs "$sourceFile" "$targetFile" &>/dev/null
             code=$?
-            when_plain print_result $code "$targetFile → $sourceFile"
+            print_symlink_result $code "$displayTarget" "$displaySource"
         fi
     done
 
