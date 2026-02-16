@@ -13,14 +13,24 @@ setup_nvim() {
 }
 # setup zsh
 setup_zsh() {
-  gh completion -s zsh > ~/.zsh/completion/_gh 2>/dev/null
+  mkdir -p ~/.zsh/completion
+  local -a completions=()
+  gh completion -s zsh > ~/.zsh/completion/_gh 2>/dev/null && completions+=(gh)
+  if [ -d "$SETUP_ROOT/dotfiles/.zsh/completion" ]; then
+    for f in "$SETUP_ROOT/dotfiles/.zsh/completion"/_*; do
+      completions+=("$(basename "$f" | sed 's/^_//')")
+      [ -e "$f" ] || continue
+      ln -sf "$f" ~/.zsh/completion/
+    done
+  fi
   local custom="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
   [ -d "$custom/plugins/zsh-syntax-highlighting" ] || git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "$custom/plugins/zsh-syntax-highlighting" > /dev/null 2>&1
   [ -d "$custom/plugins/zsh-autosuggestions" ] || git clone https://github.com/zsh-users/zsh-autosuggestions.git "$custom/plugins/zsh-autosuggestions" > /dev/null 2>&1
   when_plain print_success "zsh configured with"
-  when_plain print_note "      completion:" "gh"
-  when_plain print_note "      plugin:" "zsh-syntax-highlighting"
-  when_plain print_note "      plugin:" "zsh-autosuggestions"
+  print_note ""
+  [ ${#completions[@]} -gt 0 ] && print_note "      completion:" "$(IFS=', '; echo "${completions[*]}")"
+  print_note "      plugin:" "zsh-syntax-highlighting"
+  print_note "      plugin:" "zsh-autosuggestions"
 }
 
 setup_osx() {
