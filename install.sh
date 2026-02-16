@@ -15,6 +15,7 @@ DEFAULT_INSTALL_ALACRITTY="yes"
 DEFAULT_INSTALL_OCAML="no"
 DEFAULT_INSTALL_AG="no"
 DEFAULT_INSTALL_AMETHYST="no"
+DEFAULT_INSTALL_CONDUIT="yes"
 
 NODE_DEFAULT_VERSION=24
 
@@ -299,6 +300,21 @@ install_lazygit() {
   step_end $? "lazygit installed"
 }
 
+# Conduit: multi-agent TUI (Claude Code, Codex CLI, Gemini CLI).
+# Default provider and agent install are handled by setup-agents (run during setup.sh -i).
+install_conduit() {
+  if ! cmd_exists "conduit"; then
+    confirm_optional "Install Conduit? (multi-agent TUI for Claude/Codex/Gemini CLI)" "$DEFAULT_INSTALL_CONDUIT" || return 0
+    step_start "Installing conduit"
+    run_with_spinner "Installing conduit" brew install conduit-cli/tap/conduit
+    step_end $? "conduit installed"
+  else
+    step_start "Installing conduit"
+    step_end 0 "conduit already installed"
+  fi
+  print_note "      agents:" "Run setup-agents (during setup.sh -i or manually) to choose default provider and presets"
+}
+
 # Caskaydia Nerd Fonts. 2>&1 | cat so brew progress doesn't leak \r noise.
 install_fonts() {
   step_start "Installing Caskaydia nerdfonts"
@@ -360,6 +376,7 @@ if [ "$INTERACTIVE" = 1 ] && cmd_exists "gh"; then
 fi
 install_gitdelta
 install_lazygit
+install_conduit
 install_fonts
 install_neovim
 install_tmux

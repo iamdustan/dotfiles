@@ -47,6 +47,21 @@ setup_alacritty() {
   when_plain print_success "alacritty configured"
 }
 
+setup_conduit() {
+  mkdir -p ~/.conduit 2>/dev/null
+  local default_agent="claude"
+  if [ -f "$SETUP_ROOT/config/conduit/.default_agent" ]; then
+    read -r default_agent < "$SETUP_ROOT/config/conduit/.default_agent" || true
+    case "$default_agent" in
+      claude|codex|gemini) ;;
+      *) default_agent="gemini" ;;
+    esac
+  fi
+  sed "s/^default_agent = .*/default_agent = \"$default_agent\"/" \
+    "$SETUP_ROOT/config/conduit/config.toml" > ~/.conduit/config.toml
+  when_plain print_success "conduit configured (default_agent=$default_agent)"
+}
+
 main() {
   if [ "$PLAIN" = 1 ]; then
     print_info "Configuring apps"
@@ -57,6 +72,7 @@ main() {
   setup_nvim
   setup_osx
   setup_alacritty
+  setup_conduit
   setup_zsh
 
   if [ "$PLAIN" = 1 ]; then

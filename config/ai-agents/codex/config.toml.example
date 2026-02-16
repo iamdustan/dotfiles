@@ -1,0 +1,15 @@
+# Codex CLI user config — copy to ~/.codex/config.toml and add your MCP servers.
+# https://developers.openai.com/codex/mcp/
+
+[mcp_servers.fetch]
+command = "uvx"
+args = ["mcp-server-fetch"]
+env = {}
+cwd = ""
+startup_timeout_sec = 30
+tool_timeout_sec = 60
+enabled = true
+
+# [mcp_servers.github]
+# url = "https://api.githubcopilot.com/mcp/"
+# bearer_token_env_var = "GITHUB_PERSONAL_ACCESS_TOKEN"

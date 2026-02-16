@@ -1,0 +1,280 @@
+#!/usr/bin/env bash
+#
+# Agent setup: default provider (Conduit + claude/codex/gemini), then presets → Codex/Gemini/Claude MCPs.
+# Creates ~/projects/triathlon for triathlon preset; ensures state-of-the-art doc for state-of-art.
+# Run during setup.sh -i or anytime.
+#
+# Usage: setup-agents [--skip-bootstrap]
+
+set -e
+
+SCRIPT_PATH="$0"
+while [ -L "$SCRIPT_PATH" ]; do
+  TARGET="$(readlink "$SCRIPT_PATH")"
+  case "$TARGET" in
+    /*) SCRIPT_PATH="$TARGET" ;;
+    *)  SCRIPT_PATH="$(dirname "$SCRIPT_PATH")/$TARGET" ;;
+  esac
+done
+SCRIPT_DIR="$(cd "$(dirname "$SCRIPT_PATH")" && pwd)"
+SETUP_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+AI_AGENTS="$SETUP_ROOT/config/ai-agents"
+PRESETS_DIR="$AI_AGENTS/presets"
+SCRIPTS_DIR="$AI_AGENTS/scripts"
+PYTHON_PRESET_SCRIPT="$SCRIPTS_DIR/preset-to-agent-configs.py"
+CONDUIT_CONFIG_TEMPLATE="$SETUP_ROOT/config/conduit/config.toml"
+
+CONDUIT_AGENT_CLAUDE_PKG="@anthropic-ai/claude-code"
+CONDUIT_AGENT_CODEX_PKG="@openai/codex"
+CONDUIT_AGENT_GEMINI_PKG="@google/gemini-cli"
+
+SKIP_BOOTSTRAP=0
+for arg in "$@"; do
+  case "$arg" in
+    --skip-bootstrap) SKIP_BOOTSTRAP=1 ;;
+  esac
+done
+
+cmd_exists() { command -v "$1" &>/dev/null; }
+
+# --- Default provider: ask, install Conduit + agent, write .default_agent and ~/.conduit/config.toml ---
+setup_default_provider() {
+  echo "Step 1 — Default Conduit provider"
+  local choice="claude"
+  printf "  Default provider? 1) claude  2) codex  3) gemini  [1] "
+  read -r
+  if [ -n "${REPLY:-}" ]; then
+    case "${REPLY}" in
+      1) choice="claude" ;;
+      2) choice="codex" ;;
+      3) choice="gemini" ;;
+      claude|codex|gemini) choice="${REPLY}" ;;
+      *) choice="claude" ;;
+    esac
+  fi
+
+  if ! cmd_exists "conduit"; then
+    echo "  Installing Conduit..."
+    if brew install conduit-cli/tap/conduit 2>/dev/null; then
+      echo "  Conduit installed"
+    else
+      echo "  Conduit install failed (run: brew install conduit-cli/tap/conduit)" >&2
+    fi
+  fi
+
+  local pkg=""
+  case "$choice" in
+    claude) pkg="$CONDUIT_AGENT_CLAUDE_PKG" ;;
+    codex)  pkg="$CONDUIT_AGENT_CODEX_PKG" ;;
+    gemini) pkg="$CONDUIT_AGENT_GEMINI_PKG" ;;
+  esac
+  if [ -n "$pkg" ] && ! cmd_exists "$choice"; then
+    echo "  Installing $choice..."
+    if npm install -g "$pkg" 2>/dev/null; then
+      echo "  $choice installed"
+    else
+      echo "  $choice install failed (run: npm install -g $pkg)" >&2
+    fi
+  fi
+
+  mkdir -p "$SETUP_ROOT/config/conduit"
+  printf '%s\n' "$choice" > "$SETUP_ROOT/config/conduit/.default_agent"
+  mkdir -p "$HOME/.conduit"
+  if [ -f "$CONDUIT_CONFIG_TEMPLATE" ]; then
+    sed "s/^default_agent = .*/default_agent = \"$choice\"/" "$CONDUIT_CONFIG_TEMPLATE" > "$HOME/.conduit/config.toml"
+    echo "  Set default provider: $choice (~/.conduit/config.toml)"
+  fi
+  echo ""
+}
+
+# --- Bootstrap base configs ---
+bootstrap_base() {
+  mkdir -p "$HOME/.codex" "$HOME/.gemini"
+  if [ ! -f "$HOME/.codex/config.toml" ]; then
+    cp "$AI_AGENTS/codex/config.toml.example" "$HOME/.codex/config.toml"
+    echo "  created ~/.codex/config.toml from example"
+  fi
+  if [ ! -f "$HOME/.gemini/settings.json" ]; then
+    cp "$AI_AGENTS/gemini/settings.json.example" "$HOME/.gemini/settings.json"
+    echo "  created ~/.gemini/settings.json from example"
+  fi
+}
+
+# --- List presets (id, name, description) ---
+list_presets() {
+  local files=()
+  for f in "$PRESETS_DIR"/*.toml; do
+    [ -f "$f" ] && files+=("$f")
+  done
+  [ ${#files[@]} -eq 0 ] && return
+  python3 "$PYTHON_PRESET_SCRIPT" --list "${files[@]}"
+}
+
+# --- Parse user selection "1,3" or "1-3" or "product-eng,triathlon" into preset ids ---
+parse_selection() {
+  local input="$1" list_json="$2"
+  local ids=()
+  input="${input// /}"
+  if [ -z "$input" ]; then
+    echo ""
+    return
+  fi
+  local i
+  for i in ${input//,/ }; do
+    if [[ "$i" =~ ^[0-9]+$ ]]; then
+      local id
+      id=$(echo "$list_json" | jq -r --argjson n "$i" '.[$n - 1].id // empty')
+      [ -n "$id" ] && ids+=("$id")
+    elif [[ "$i" =~ ^[0-9]+-[0-9]+$ ]]; then
+      local start end j
+      start="${i%-*}"
+      end="${i#*-}"
+      for (( j = start; j <= end; j++ )); do
+        id=$(echo "$list_json" | jq -r --argjson n "$j" '.[$n - 1].id // empty')
+        [ -n "$id" ] && ids+=("$id")
+      done
+    else
+      ids+=("$i")
+    fi
+  done
+  printf '%s\n' "${ids[@]}" | awk '!seen[$0]++'
+}
+
+# --- Main ---
+main() {
+  echo ""
+  echo "Agent setup (default provider + presets → Codex, Gemini, Claude)"
+  echo ""
+
+  setup_default_provider
+
+  if [ "$SKIP_BOOTSTRAP" -eq 0 ]; then
+    echo "Step 2 — Base configs"
+    bootstrap_base
+    echo ""
+  fi
+
+  if [ ! -f "$PYTHON_PRESET_SCRIPT" ]; then
+    echo "Error: $PYTHON_PRESET_SCRIPT not found" >&2
+    exit 1
+  fi
+
+  local list_json
+  list_json=$(list_presets)
+  [ -z "$list_json" ] || [ "$list_json" = "[]" ] && echo "No presets found in $PRESETS_DIR" && exit 0
+
+  echo "Step 3 — Presets"
+  echo "$list_json" | jq -r 'to_entries[] | "  \(.key + 1)) \(.value.id): \(.value.name) — \(.value.description)"'
+  echo ""
+
+  echo "Step 4 — Which presets do you want? (e.g. 1,3 or 1-4 or product-eng,triathlon) [default: none]"
+  read -r selection
+  selection="${selection:-none}"
+  if [ "$selection" = "none" ] || [ -z "$selection" ]; then
+    echo "  No presets selected. Done."
+    exit 0
+  fi
+
+  local selected_ids
+  selected_ids=($(parse_selection "$selection" "$list_json"))
+  [ ${#selected_ids[@]} -eq 0 ] && echo "  No valid presets. Done." && exit 0
+
+  local preset_files=()
+  local id
+  for id in "${selected_ids[@]}"; do
+    local f="$PRESETS_DIR/${id}.toml"
+    [ -f "$f" ] && preset_files+=("$f")
+  done
+
+  echo ""
+  echo "Step 5 — Merging presets: ${selected_ids[*]}"
+  local merge_json
+  merge_json=$(python3 "$PYTHON_PRESET_SCRIPT" "${preset_files[@]}")
+
+  local plan_path
+  plan_path=$(echo "$merge_json" | jq -r '.plan_path // empty')
+  if [ -n "$plan_path" ]; then
+    plan_path="${plan_path/#\~/$HOME}"
+    mkdir -p "$(dirname "$plan_path")"
+    if [ ! -f "$plan_path" ]; then
+      cat > "$plan_path" << 'PLANEOF'
+# My triathlon plan
+
+(Will sync with Obsidian vault.)
+
+## Current block
+
+- Goal:
+- Weeks remaining:
+
+## This week
+
+| Day   | Session      | Notes |
+|-------|--------------|-------|
+| Mon   |              |       |
+| Tue   |              |       |
+| Wed   |              |       |
+| Thu   |              |       |
+| Fri   |              |       |
+| Sat   |              |       |
+| Sun   |              |       |
+
+## Next week (draft)
+
+- 
+PLANEOF
+      echo "  created $plan_path"
+    fi
+  fi
+
+  if printf '%s\n' "${selected_ids[@]}" | grep -qx "state-of-art"; then
+    local doc="$AI_AGENTS/state-of-the-art.md"
+    [ -f "$doc" ] && echo "  state-of-the-art: $doc"
+    echo "  Registry: https://registry.modelcontextprotocol.io/"
+    echo "  Directory: https://mcpserverdirectory.org/"
+    echo "  Servers (GitHub): https://github.com/modelcontextprotocol/servers"
+  fi
+
+  echo ""
+  echo "Step 6 — Writing agent configs"
+
+  local codex_base codex_append
+  codex_base=$(cat "$AI_AGENTS/codex/config.toml.example")
+  codex_append=$(echo "$merge_json" | jq -r '.codex_toml // empty')
+  if [ -n "$codex_append" ]; then
+    codex_base=$(echo "$codex_base" | awk '/^\[mcp_servers\./ { exit } { print }')
+    printf '%s\n%s\n' "$codex_base" "$codex_append" > "$HOME/.codex/config.toml"
+    echo "  wrote ~/.codex/config.toml"
+  fi
+
+  local gemini_base new_servers merged
+  gemini_base=$(cat "$AI_AGENTS/gemini/settings.json.example")
+  new_servers=$(echo "$merge_json" | jq -c '.gemini_mcp_servers // {}')
+  merged=$(echo "$gemini_base" | jq --argjson new "$new_servers" '.mcpServers = (.mcpServers // {} | . * $new)')
+  echo "$merged" > "$HOME/.gemini/settings.json"
+  echo "  wrote ~/.gemini/settings.json"
+
+  local claude_script="$AI_AGENTS/claude-mcp-commands.sh"
+  {
+    echo "#!/usr/bin/env bash"
+    echo "# Run these to add MCP servers to Claude Code (or paste into Claude settings)."
+    echo "# Requires: claude CLI, and env vars set (GITHUB_PERSONAL_ACCESS_TOKEN, etc.)."
+    echo ""
+    echo "$merge_json" | jq -r '.claude_commands[]?' | while read -r cmd; do
+      echo "$cmd"
+    done
+  } > "$claude_script"
+  chmod +x "$claude_script"
+  echo "  wrote $claude_script (run it to add MCPs to Claude Code)"
+
+  echo ""
+  echo "Step 7 — Env / keys to set"
+  echo "$merge_json" | jq -r '.env_vars[]?' | while read -r ev; do
+    echo "  - $ev"
+  done
+  echo ""
+  echo "Done. Run 'conduit' to use your agents; run the triathlon weekly prompt from config/ai-agents/triathlon/weekly-review-prompt.md"
+  echo ""
+}
+
+main "$@"

@@ -14,3 +14,8 @@ source "$SETUP_ROOT/setup-common.sh" "$@"
 
 # Setup applications
 "$SETUP_ROOT/setup-apps.sh" "$@"
+
+# Setup AI agents
+if [ "$INTERACTIVE" = 1 ]; then
+  "$SETUP_ROOT/bin/setup-agents"
+fi

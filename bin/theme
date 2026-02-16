@@ -25,6 +25,7 @@ if [ -f "${HOME}/.config/alacritty/alacritty.toml" ]; then
 else
   ALACRITTY_TOML="${REPO_ROOT}/config/alacritty/alacritty.toml"
 fi
+CONDUIT_CONFIG="${HOME}/.conduit/config.toml"
 
 # --- OS theme (macOS) ---
 get_os_theme() {
@@ -77,6 +78,15 @@ apply_theme() {
 
   # Neovim: notify running instances
   reload_nvim_themes
+
+  # Conduit: set built-in theme (light/dark); Conduit picks it up on next launch or Alt+T
+  if [ -f "$CONDUIT_CONFIG" ]; then
+    if [ "$mode" = "light" ]; then
+      sed -i '' 's/^name = ".*"$/name = "catppuccin-latte"/' "$CONDUIT_CONFIG"
+    else
+      sed -i '' 's/^name = ".*"$/name = "catppuccin-mocha"/' "$CONDUIT_CONFIG"
+    fi
+  fi
 
   return 0
 }
@@ -179,10 +189,11 @@ main() {
       else
         echo "Current theme: $(get_os_theme) (from OS; run 'theme sync' to persist)"
       fi
+      echo "Conduit: $([ -f "$CONDUIT_CONFIG" ] && echo 'config present' || echo 'no config')"
       echo "Usage: theme [sync|light|dark|toggle|status|--install-launch-agent]"
       ;;
     -h|--help)
-      echo "theme — sync Alacritty, Neovim, delta, and tmux with OS appearance"
+      echo "theme — sync Alacritty, Neovim, delta, tmux, and Conduit with OS appearance"
       echo ""
       echo "  theme          Sync from OS (default)"
       echo "  theme sync     Same; only updates if OS theme changed"
