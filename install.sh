@@ -137,25 +137,46 @@ install_gitdelta() {
 
 
 install_rustup() {
-  step_start "Installing rustup/cargo"
-  if ! cmd_exists "cargo"; then
-    run_with_spinner "Installing rustup/cargo" bash -c "curl https://sh.rustup.rs -sSf | sh"
-    step_end $? "cargo installed"
-  else
+  if cmd_exists "cargo"; then
+    step_start "Installing rustup/cargo"
     step_end 0 "cargo already installed"
+    return 0
   fi
+  confirm_optional "Install rustup/cargo?" "$DEFAULT_INSTALL_RUSTUP" || return 0
+  step_start "Installing rustup/cargo"
+  run_with_spinner "Installing rustup/cargo" bash -c "curl https://sh.rustup.rs -sSf | sh"
+  step_end $? "cargo installed"
 }
 
 # OpenGL terminal emulator
 # https://github.com/alacritty/alacritty
 install_alacritty() {
-  step_start "Installing alacritty"
-  if ! brew cask info alacritty &>/dev/null; then
-    run_with_spinner "Installing alacritty" bash -c "brew cask install alacritty && sudo tic -xe alacritty,alacritty-direct extra/alacritty.info"
-    step_end $? "alacritty installed"
-  else
+  local parent="$(dirname "$SETUP_ROOT")"
+  local alacritty_dir="$parent/alacritty"
+  local app_bundle="$alacritty_dir/target/release/osx/Alacritty.app"
+
+  if [ -d /Applications/Alacritty.app ] || cmd_exists "alacritty"; then
+    step_start "Installing alacritty"
     step_end 0 "alacritty already installed"
+    return 0
   fi
+  if [ -d "$alacritty_dir" ] && [ -d "$app_bundle" ]; then
+    step_start "Installing alacritty"
+    step_end 0 "alacritty already installed (from source)"
+    return 0
+  fi
+  confirm_optional "Install alacritty from source? (gh clone + make app)" "$DEFAULT_INSTALL_ALACRITTY" || return 0
+  step_start "Installing alacritty"
+  if [ ! -d "$alacritty_dir" ]; then
+    run_with_spinner "Cloning alacritty" bash -c "cd \"$parent\" && gh repo clone alacritty/alacritty"
+    local err=$?
+    [ $err -ne 0 ] && step_end 1 "alacritty clone failed" && return 1
+  fi
+  run_with_spinner "Building alacritty" bash -c "cd \"$alacritty_dir\" && make app"
+  err=$?
+  [ $err -ne 0 ] && step_end 1 "alacritty build failed" && return 1
+  cp -r "$app_bundle" /Applications/ 2>/dev/null || true
+  step_end 0 "alacritty installed from source"
 }
 
 # vim for the modern era
