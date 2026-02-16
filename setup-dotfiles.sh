@@ -16,7 +16,7 @@ print_symlink_result() {
   fi
 }
 
-declare -a FILES_TO_SYMLINK=$(find dotfiles -type f -name ".*" -not -name .DS_Store -not -name .git -not -name .osx | sed -e 's|//|/|')
+declare -a FILES_TO_SYMLINK=$(cd "$SETUP_ROOT" && find dotfiles -type f -name ".*" -not -name .DS_Store -not -name .git -not -name .osx | sed -e 's|//|/|')
 FILES_TO_SYMLINK="$FILES_TO_SYMLINK bin"
 
 main() {
@@ -33,7 +33,7 @@ main() {
     fi
 
     for i in ${FILES_TO_SYMLINK[@]}; do
-        sourceFile="$(pwd)/$i"
+        sourceFile="$SETUP_ROOT/$i"
         targetFile="$HOME/$(printf "%s" "$i" | sed "s/.*\/\(.*\)/\1/g")"
         displayTarget="${targetFile/#$HOME/~}"
         displaySource="${sourceFile/#$HOME/~}"

@@ -14,8 +14,9 @@ setup_nvim() {
 # setup zsh
 setup_zsh() {
   gh completion -s zsh > ~/.zsh/completion/_gh 2>/dev/null
-  git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting > /dev/null 2>&1
-  git clone https://github.com/zsh-users/zsh-autosuggestions.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions > /dev/null 2>&1
+  local custom="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
+  [ -d "$custom/plugins/zsh-syntax-highlighting" ] || git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "$custom/plugins/zsh-syntax-highlighting" > /dev/null 2>&1
+  [ -d "$custom/plugins/zsh-autosuggestions" ] || git clone https://github.com/zsh-users/zsh-autosuggestions.git "$custom/plugins/zsh-autosuggestions" > /dev/null 2>&1
   when_plain print_success "zsh configured with"
   when_plain print_note "      completion:" "gh"
   when_plain print_note "      plugin:" "zsh-syntax-highlighting"
@@ -23,6 +24,7 @@ setup_zsh() {
 }
 
 setup_osx() {
+  [ "$(uname)" = "Darwin" ] || return 0
   defaults write com.apple.finder QuitMenuItem -bool YES
   defaults write com.apple.dock persistent-apps -array
   when_plain print_success "osx defaults configured"

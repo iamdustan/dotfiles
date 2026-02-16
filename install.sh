@@ -21,7 +21,7 @@ NODE_DEFAULT_VERSION=24
 install_homebrew() {
   step_start "Installing homebrew"
   if ! cmd_exists "brew"; then
-    run_with_spinner "Installing homebrew" /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+    run_with_spinner "Installing homebrew" /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     step_end $? "homebrew installed"
   else
     step_end 0 "homebrew already installed"
