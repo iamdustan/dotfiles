@@ -1,0 +1,2 @@
+# Per-machine default agent (set by setup.sh -i)
+.default_agent

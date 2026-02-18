@@ -7,12 +7,11 @@ export ZSH_THEME="theunraveler"
 # ENABLE_CORRECTION="true"
 export EDITOR="nvim"
 
-plugins+=(git nx-completion)
+plugins+=(git zsh-autosuggestions zsh-syntax-highlighting)
 source $ZSH/oh-my-zsh.sh
 
-
 # plugins+=(nx-completions)
-source ~/.oh-my-zsh/custom/plugins/nx-completion/nx-completion.plugin.zsh
+# source ~/.oh-my-zsh/custom/plugins/nx-completion/nx-completion.plugin.zsh
 
 bindkey -v
 bindkey "^F" vi-cmd-mode
@@ -82,8 +81,8 @@ export PATH="node_modules/.bin:$PATH"
 # fnm
 eval "$(fnm env)"
 
-# cargo
-source $HOME/.cargo/env
+# cargo (when rustup is installed)
+[[ -f $HOME/.cargo/env ]] && source $HOME/.cargo/env
 
 # ocaml
 eval `opam config env`

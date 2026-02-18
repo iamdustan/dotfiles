@@ -1,0 +1,6 @@
+#compdef theme
+# Completion for theme script (sync Alacritty, Neovim, delta, tmux with OS appearance)
+
+_arguments \
+  '1: :(sync light dark toggle status --install-launch-agent --help -h)' \
+  '*:: :->null'

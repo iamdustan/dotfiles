@@ -1,0 +1,214 @@
+#!/usr/bin/env bash
+#
+# Sync Alacritty, Neovim, git-delta, and tmux with OS appearance (Light/Dark).
+# Usage: theme [sync|light|dark|toggle|status|--install-launch-agent]
+# With no args: same as "theme sync" (read OS and apply if changed).
+
+set -e
+
+# Resolve script path and repo root (follow symlinks for ~/bin -> dotfiles/bin).
+SCRIPT_PATH="$0"
+while [ -L "$SCRIPT_PATH" ]; do
+  TARGET="$(readlink "$SCRIPT_PATH")"
+  case "$TARGET" in
+    /*) SCRIPT_PATH="$TARGET" ;;
+    *)  SCRIPT_PATH="$(dirname "$SCRIPT_PATH")/$TARGET" ;;
+  esac
+done
+SCRIPT_DIR="$(cd "$(dirname "$SCRIPT_PATH")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+THEME_MODE_FILE="${HOME}/.theme-mode"
+TMUX_THEME_FILE="${HOME}/.tmux-theme.conf"
+# Prefer the path Alacritty actually loads so theme updates always apply
+if [ -f "${HOME}/.config/alacritty/alacritty.toml" ]; then
+  ALACRITTY_TOML="${HOME}/.config/alacritty/alacritty.toml"
+else
+  ALACRITTY_TOML="${REPO_ROOT}/config/alacritty/alacritty.toml"
+fi
+CONDUIT_CONFIG="${HOME}/.conduit/config.toml"
+
+# --- OS theme (macOS) ---
+get_os_theme() {
+  if defaults read -g AppleInterfaceStyle &>/dev/null; then
+    echo "dark"
+  else
+    echo "light"
+  fi
+}
+
+# --- Current theme from our state file ---
+get_saved_theme() {
+  if [ -f "$THEME_MODE_FILE" ]; then
+    tr -d '[:space:]' < "$THEME_MODE_FILE" | head -c 20
+  else
+    echo ""
+  fi
+}
+
+# --- Apply theme to all apps ---
+apply_theme() {
+  local mode="$1"
+  [ "$mode" = "light" ] || [ "$mode" = "dark" ] || return 1
+
+  printf '%s' "$mode" > "$THEME_MODE_FILE"
+
+  # Alacritty: switch import between catppuccin_latte and catppuccin_macchiato (active line only)
+  if [ -f "$ALACRITTY_TOML" ]; then
+    if [ "$mode" = "light" ]; then
+      sed -i '' '/^[[:space:]]*#/! s|catppuccin_macchiato|catppuccin_latte|g' "$ALACRITTY_TOML"
+    else
+      sed -i '' '/^[[:space:]]*#/! s|catppuccin_latte|catppuccin_macchiato|g' "$ALACRITTY_TOML"
+    fi
+  fi
+
+  # Delta (git pager)
+  if [ "$mode" = "light" ]; then
+    git config --global delta.light true
+    git config --global delta.dark false
+  else
+    git config --global delta.dark true
+    git config --global delta.light false
+  fi
+
+  # Tmux: write theme snippet and reload
+  write_tmux_theme "$mode"
+  if command -v tmux &>/dev/null && tmux has-session 2>/dev/null; then
+    tmux source-file "$TMUX_THEME_FILE" 2>/dev/null || true
+  fi
+
+  # Neovim: notify running instances
+  reload_nvim_themes
+
+  # Conduit: set built-in theme (light/dark); Conduit picks it up on next launch or Alt+T
+  if [ -f "$CONDUIT_CONFIG" ]; then
+    if [ "$mode" = "light" ]; then
+      sed -i '' 's/^name = ".*"$/name = "catppuccin-latte"/' "$CONDUIT_CONFIG"
+    else
+      sed -i '' 's/^name = ".*"$/name = "catppuccin-mocha"/' "$CONDUIT_CONFIG"
+    fi
+  fi
+
+  return 0
+}
+
+write_tmux_theme() {
+  local mode="$1"
+  if [ "$mode" = "light" ]; then
+    cat > "$TMUX_THEME_FILE" << 'TMUX_LIGHT'
+# Light theme (Catppuccin Latte–inspired)
+set -g status-bg '#e6e9ef'
+set -g status-fg '#4c4f69'
+set -w -g window-status-current-style bg='#ccd0da',fg='#4c4f69'
+setw -g window-status-current-format "#[fg=#e6e9ef,bg=#ccd0da,nobold,nounderscore,noitalics]#[fg=#4c4f69,bg=#ccd0da,bold] #I #{b:pane_current_path} #F #[fg=#ccd0da,bg=#e6e9ef,nobold,nounderscore,noitalics]"
+setw -g window-status-format "  #I #{b:pane_current_path} #F  "
+TMUX_LIGHT
+  else
+    cat > "$TMUX_THEME_FILE" << 'TMUX_DARK'
+# Dark theme (current dotfiles default)
+set -g status-bg '#274352'
+set -g status-fg white
+set -w -g window-status-current-style bg='#65737e',fg='#1d2d35'
+setw -g window-status-current-format "#[fg=#274352,bg=#abb2bb,nobold,nounderscore,noitalics]#[fg=#232831,bg=#abb1bb,bold] #I #{b:pane_current_path} #F #[fg=#abb1bb,bg=#274352,nobold,nounderscore,noitalics]"
+setw -g window-status-format "  #I #{b:pane_current_path} #F  "
+TMUX_DARK
+  fi
+}
+
+reload_nvim_themes() {
+  local sock
+  # Neovim only has a server if started with --listen or we start one in config.
+  # Our config starts server at /tmp/nvim-theme-sync-<pid> (and $TMPDIR on some systems).
+  for base in /tmp "${TMPDIR:-/tmp}"; do
+    [ ! -d "$base" ] && continue
+    for sock in "$base"/nvim-theme-sync-*; do
+      [ -S "$sock" ] && nvim --server "$sock" --remote-send '<Cmd>ThemeReload<CR>' 2>/dev/null || true
+    done
+  done
+}
+
+# --- Install LaunchAgent (macOS) ---
+install_launch_agent() {
+  local plist_dir="${REPO_ROOT}/config/launchd"
+  local plist_src="${plist_dir}/com.user.theme-sync.plist"
+  local dest_dir="${HOME}/Library/LaunchAgents"
+  local dest_plist="${dest_dir}/com.user.theme-sync.plist"
+  local script_path="${SCRIPT_DIR}/theme"
+
+  if [ ! -f "$plist_src" ]; then
+    echo "Error: template not found: $plist_src" >&2
+    return 1
+  fi
+
+  mkdir -p "$dest_dir"
+  sed -e "s|__HOME__|${HOME}|g" -e "s|__THEME_SCRIPT__|${script_path}|g" \
+    < "$plist_src" > "$dest_plist"
+  launchctl load "$dest_plist" 2>/dev/null && echo "LaunchAgent loaded." || echo "Installed at $dest_plist (load with: launchctl load $dest_plist)"
+}
+
+# --- Main ---
+main() {
+  local cmd="${1:-sync}"
+
+  case "$cmd" in
+    --install-launch-agent)
+      install_launch_agent
+      return $?
+      ;;
+    sync)
+      local os_theme
+      os_theme="$(get_os_theme)"
+      if [ "$(get_saved_theme)" = "$os_theme" ]; then
+        exit 0
+      fi
+      apply_theme "$os_theme"
+      echo "Theme set to $os_theme (from OS)."
+      ;;
+    light|dark)
+      apply_theme "$cmd"
+      echo "Theme set to $cmd."
+      ;;
+    toggle)
+      local current
+      current="$(get_saved_theme)"
+      if [ "$current" = "light" ]; then
+        apply_theme "dark"
+        echo "Theme set to dark."
+      elif [ "$current" = "dark" ]; then
+        apply_theme "light"
+        echo "Theme set to light."
+      else
+        apply_theme "$(get_os_theme)"
+        echo "Theme set to $(get_saved_theme) (from OS)."
+      fi
+      ;;
+    status)
+      local saved
+      saved="$(get_saved_theme)"
+      if [ -n "$saved" ]; then
+        echo "Current theme: $saved"
+      else
+        echo "Current theme: $(get_os_theme) (from OS; run 'theme sync' to persist)"
+      fi
+      echo "Conduit: $([ -f "$CONDUIT_CONFIG" ] && echo 'config present' || echo 'no config')"
+      echo "Usage: theme [sync|light|dark|toggle|status|--install-launch-agent]"
+      ;;
+    -h|--help)
+      echo "theme — sync Alacritty, Neovim, delta, tmux, and Conduit with OS appearance"
+      echo ""
+      echo "  theme          Sync from OS (default)"
+      echo "  theme sync     Same; only updates if OS theme changed"
+      echo "  theme light    Force light theme"
+      echo "  theme dark     Force dark theme"
+      echo "  theme toggle   Switch between light and dark"
+      echo "  theme status  Show current theme and usage"
+      echo "  theme --install-launch-agent   Install LaunchAgent to sync on OS change (macOS)"
+      ;;
+    *)
+      echo "Unknown command: $cmd" >&2
+      echo "Usage: theme [sync|light|dark|toggle|status|--install-launch-agent]" >&2
+      return 1
+      ;;
+  esac
+}
+
+main "$@"

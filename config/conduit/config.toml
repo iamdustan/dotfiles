@@ -1,0 +1,16 @@
+# Conduit TUI — multi-agent terminal UI (Claude Code, Codex CLI, Gemini CLI)
+# https://getconduit.sh/docs/
+# Written by setup-apps.sh / setup-agents to ~/.conduit/config.toml
+# Theme name is updated by bin/theme (sync with OS light/dark).
+
+default_agent = "claude"
+max_tabs = 10
+show_token_usage = true
+show_cost = true
+
+[theme]
+name = "catppuccin-latte"
+
+[selection]
+auto_copy_selection = true
+clear_selection_after_copy = true

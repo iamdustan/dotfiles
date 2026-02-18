@@ -1,0 +1,10 @@
+# State of the art: discovery and curated "what to try"
+id = "state-of-art"
+name = "State of the art"
+description = "MCP registry, directory, and curated recommendations"
+
+# No mcp_servers; guided script creates state-of-the-art.md and prints links
+docs_url_registry = "https://registry.modelcontextprotocol.io/"
+docs_url_directory = "https://mcpserverdirectory.org/"
+docs_url_servers = "https://github.com/modelcontextprotocol/servers"
+curated_doc = "config/ai-agents/state-of-the-art.md"

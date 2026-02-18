@@ -1,0 +1,16 @@
+# Triathlon coach: plan at ~/projects/triathlon, Strava, weekly review loop
+id = "triathlon-coach"
+name = "Triathlon coach"
+description = "Training plan, Strava data, critique, interactive weekly planning"
+
+plan_path = "~/projects/triathlon"
+plan_filename = "current-plan.md"
+
+[mcp_servers.strava]
+command = "npx"
+args = ["-y", "strava-mcp"]
+env_var = "STRAVA_ACCESS_TOKEN"
+
+[mcp_servers.filesystem_triathlon]
+command = "npx"
+args = ["-y", "@modelcontextprotocol/server-filesystem", "--allowed-directories", "~/projects/triathlon"]

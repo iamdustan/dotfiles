@@ -1,0 +1,14 @@
+# Eng director: calendar, Slack, priorities, delegation, org health
+id = "eng-director"
+name = "Eng director"
+description = "Calendar, Slack, priorities, delegation, strategic planning, org health"
+
+[mcp_servers.google_calendar]
+command = "npx"
+args = ["-y", "@nspady/google-calendar-mcp"]
+env_var = "GOOGLE_CALENDAR_CREDENTIALS"
+
+[mcp_servers.slack]
+command = "npx"
+args = ["-y", "@modelcontextprotocol/server-slack"]
+env_var = "SLACK_BOT_TOKEN"
