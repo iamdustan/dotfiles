@@ -6,7 +6,15 @@ return {
 			-- 💼 Neovim plugin to manage global and project-local settings
 			{ "folke/neoconf.nvim", cmd = "Neoconf", config = true },
 			-- Standalone UI for nvim-lsp progress. Eye candy for the impatient
-			{ "j-hui/fidget.nvim", tag = "legacy", event = "LspAttach", config = true },
+			{
+				"j-hui/fidget.nvim",
+				event = "VeryLazy",
+				opts = {
+					notification = {
+						override_vim_notify = true,
+					},
+				},
+			},
 			-- Incremental LSP renaming based on Neovim's command-preview feature.
 			{ "smjonas/inc-rename.nvim", config = true },
 
