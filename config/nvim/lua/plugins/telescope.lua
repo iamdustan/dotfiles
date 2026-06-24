@@ -20,7 +20,39 @@ return {
 		},
 
 		config = function()
-			require("telescope").load_extension("file_browser")
+			local telescope = require("telescope")
+
+			telescope.setup({
+				defaults = {
+					-- Show hidden + gitignored files everywhere, but never the noise.
+					file_ignore_patterns = { "%.git/", "node_modules/" },
+					-- live_grep / grep_string: ripgrep flags to include hidden + ignored.
+					vimgrep_arguments = {
+						"rg",
+						"--color=never",
+						"--no-heading",
+						"--with-filename",
+						"--line-number",
+						"--column",
+						"--smart-case",
+						"--hidden",
+					},
+				},
+				pickers = {
+					find_files = {
+						-- fd flags: --hidden shows dotfiles, but still respect .gitignore.
+						hidden = true,
+					},
+				},
+				extensions = {
+					file_browser = {
+						hidden = true,
+						respect_gitignore = false,
+					},
+				},
+			})
+
+			telescope.load_extension("file_browser")
 		end,
 	},
 	{
