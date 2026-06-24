@@ -532,3 +532,12 @@ x = 2
 y = 2
 
 [terminal]
+
+# Shift+Enter inserts a newline in CLI agents (Claude Code, etc.) instead of
+# submitting. Sends Esc+CR (== Option/Meta+Enter), which those input boxes treat
+# as "newline"; plain Enter still sends CR and submits. Note: TOML strings only
+# support \uXXXX escapes (not \x), so Esc is written as \u001b.
+[[keyboard.bindings]]
+key = "Enter"
+mods = "Shift"
+chars = "\u001b\r"
