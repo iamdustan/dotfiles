@@ -16,6 +16,14 @@ DEFAULT_INSTALL_OCAML="no"
 DEFAULT_INSTALL_AG="no"
 DEFAULT_INSTALL_AMETHYST="no"
 DEFAULT_INSTALL_CONDUIT="yes"
+DEFAULT_INSTALL_CLOJURE="no"
+
+# Parse CLI flags specific to this install script
+for _arg in "$@"; do
+  case "$_arg" in
+    --clojure) DEFAULT_INSTALL_CLOJURE="yes" ;;
+  esac
+done
 
 NODE_DEFAULT_VERSION=24
 
@@ -98,6 +106,39 @@ install_node() {
   else
     step_end 0 "node v$version already installed"
   fi
+}
+
+# Clojure development tools (babashka + bbin + clojure-mcp-light)
+install_clojure() {
+  if cmd_exists "bb" && cmd_exists "bbin" && file_exists "$HOME/.bbin/bin/clj-paren-repair"; then
+    step_start "Installing Clojure AI Tools (babashka + bbin + clojure-mcp-light)"
+    step_end 0 "Clojure AI Tools already installed"
+    return 0
+  fi
+  confirm_optional "Install Clojure AI Tools (babashka + bbin + clojure-mcp-light)?" "$DEFAULT_INSTALL_CLOJURE" || return 0
+
+  step_start "Installing Clojure AI Tools"
+
+  # Install Babashka if missing
+  if ! cmd_exists "bb"; then
+    run_with_spinner "Installing babashka" brew install babashka
+    local err=$?
+    [ $err -ne 0 ] && step_end 1 "babashka installation failed" && return 1
+  fi
+
+  # Install bbin if missing
+  if ! cmd_exists "bbin"; then
+    run_with_spinner "Installing bbin" brew install babashka/brew/bbin
+    local err=$?
+    [ $err -ne 0 ] && step_end 1 "bbin installation failed" && return 1
+  fi
+
+  # Install clojure-mcp-light using bbin
+  run_with_spinner "Installing clojure-mcp-light" bbin install io.github.bhauman/clojure-mcp-light
+  local err=$?
+  [ $err -ne 0 ] && step_end 1 "clojure-mcp-light installation failed" && return 1
+
+  step_end 0 "Clojure AI Tools installed successfully"
 }
 
 # OCaml + opam: OCaml toolchain.
@@ -396,6 +437,7 @@ install_amethyst
 install_fnm
 install_rustup
 install_node
+install_clojure
 
 print_info "  Finished installing base applications"
 # TODO: set up a cronjob on your computer for this
