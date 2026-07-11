@@ -121,7 +121,7 @@ install_clojure() {
 
   # Install Babashka if missing
   if ! cmd_exists "bb"; then
-    run_with_spinner "Installing babashka" brew install babashka
+    run_with_spinner "Installing babashka" brew install borkdude/brew/babashka
     local err=$?
     [ $err -ne 0 ] && step_end 1 "babashka installation failed" && return 1
   fi
