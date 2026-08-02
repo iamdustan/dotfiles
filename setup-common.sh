@@ -171,6 +171,15 @@ file_exists() {
   [ -d "$1" ] && return 0 || return 1
 }
 
+# Idempotently append a line to ~/.zshrc.local (creating it if missing).
+# For config that should only apply on machines where the tool is installed.
+append_zshrc_local() {
+  local line="$1"
+  local file="$HOME/.zshrc.local"
+  [ -f "$file" ] && grep -qF "$line" "$file" 2>/dev/null && return 0
+  printf '\n%s\n' "$line" >> "$file"
+}
+
 answer_is_yes() {
   [[ "${REPLY:-}" =~ ^[Yy]$ ]] && return 0 || return 1
 }
