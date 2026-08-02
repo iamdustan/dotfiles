@@ -21,8 +21,15 @@ bindkey jj vi-cmd-mode
 [[ -f ~/.aliases ]] && source ~/.aliases
 [[ -f ~/.config/.aliases ]] && source ~/.config/.aliases
 
+# load homebrew's completion functions (whichever prefix is actually installed)
+if [ -x /opt/homebrew/bin/brew ]; then
+  fpath=(/opt/homebrew/share/zsh/site-functions $fpath)
+elif [ -x /usr/local/bin/brew ]; then
+  fpath=(/usr/local/share/zsh/site-functions $fpath)
+fi
+
 # load our own completion functions
-fpath=(~/.zsh/completion /usr/local/share/zsh/site-functions $fpath)
+fpath=(~/.zsh/completion $fpath)
 
 # completion
 autoload -U compinit
@@ -85,9 +92,9 @@ eval "$(fnm env)"
 [[ -f $HOME/.cargo/env ]] && source $HOME/.cargo/env
 
 # ocaml
-eval `opam config env`
+# eval `opam config env`
 
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+# [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 # pnpm
 export PNPM_HOME="/Users/iamdustan/Library/pnpm"
@@ -98,3 +105,21 @@ esac
 # pnpm end
 
 
+
+# sentry
+fpath=("/Users/iamdustan/.local/share/zsh/site-functions" $fpath)
+
+
+# Added by Antigravity CLI installer
+export PATH="/Users/iamdustan/.local/bin:$PATH"
+
+# Pi
+export PATH="/Users/iamdustan/.fnm/node-versions/v24.11.1/installation/bin:$PATH"
+
+# homebrew (whichever prefix is actually installed - arm64 vs intel)
+if [ -x /opt/homebrew/bin/brew ]; then
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+elif [ -x /usr/local/bin/brew ]; then
+  eval "$(/usr/local/bin/brew shellenv)"
+fi
+[ -d "$HOMEBREW_PREFIX/opt/openjdk/bin" ] && export PATH="$HOMEBREW_PREFIX/opt/openjdk/bin:$PATH"

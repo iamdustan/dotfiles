@@ -5,6 +5,8 @@
 SETUP_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SETUP_ROOT/setup-common.sh" "$@"
 
+assert_native_arch
+
 # Defaults for optional steps when not -i. Change here to update behavior everywhere.
 DEFAULT_INSTALL_LAZYGIT="yes"
 DEFAULT_INSTALL_FD="yes"
@@ -29,11 +31,20 @@ NODE_DEFAULT_VERSION=24
 
 install_homebrew() {
   step_start "Installing homebrew"
-  if ! cmd_exists "brew"; then
+  if cmd_exists "brew"; then
+    local brew_prefix
+    brew_prefix="$(brew --prefix 2>/dev/null)"
+    if [ "$brew_prefix" != "$HOMEBREW_PREFIX" ]; then
+      step_end 1 "existing homebrew at $brew_prefix, expected $HOMEBREW_PREFIX for this hardware"
+      print_info "     This Homebrew was installed for a different architecture and will keep"
+      print_info "     installing Intel-only bottles. Uninstall it and re-run:"
+      print_info "     https://docs.brew.sh/Installation#uninstallation"
+      return 1
+    fi
+    step_end 0 "homebrew already installed ($brew_prefix)"
+  else
     run_with_spinner "Installing homebrew" /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     step_end $? "homebrew installed"
-  else
-    step_end 0 "homebrew already installed"
   fi
 }
 
@@ -138,6 +149,9 @@ install_clojure() {
   local err=$?
   [ $err -ne 0 ] && step_end 1 "clojure-mcp-light installation failed" && return 1
 
+  # bbin install https://github.com/bhauman/clojure-mcp-light.git --tag v0.2.2
+  # bbin install https://github.com/bhauman/clojure-mcp-light.git --tag v0.2.2 --as clj-nrepl-eval --main-opts '["-m" "clojure-mcp-light.nrepl-eval"]'
+  # bbin install https://github.com/bhauman/clojure-mcp-light.git --tag v0.2.2 --as clj-paren-repair --main-opts '["-m" "clojure-mcp-light.paren-repair"]'
   step_end 0 "Clojure AI Tools installed successfully"
 }
 
@@ -181,12 +195,20 @@ install_gitdelta() {
 install_rustup() {
   if cmd_exists "cargo"; then
     step_start "Installing rustup/cargo"
+    if [ "$HW_ARM64" = 1 ] && cmd_exists "rustup"; then
+      rustup target add aarch64-apple-darwin &>/dev/null || true
+      rustup default stable-aarch64-apple-darwin &>/dev/null || true
+    fi
     step_end 0 "cargo already installed"
     return 0
   fi
   confirm_optional "Install rustup/cargo?" "$DEFAULT_INSTALL_RUSTUP" || return 0
   step_start "Installing rustup/cargo"
-  run_with_spinner "Installing rustup/cargo" bash -c "curl https://sh.rustup.rs -sSf | sh"
+  if [ "$HW_ARM64" = 1 ]; then
+    run_with_spinner "Installing rustup/cargo (aarch64)" bash -c "curl https://sh.rustup.rs -sSf | sh -s -- -y --default-host aarch64-apple-darwin"
+  else
+    run_with_spinner "Installing rustup/cargo" bash -c "curl https://sh.rustup.rs -sSf | sh -s -- -y"
+  fi
   step_end $? "cargo installed"
 }
 
@@ -213,6 +235,10 @@ install_alacritty() {
     run_with_spinner "Cloning alacritty" bash -c "cd \"$parent\" && gh repo clone alacritty/alacritty"
     local err=$?
     [ $err -ne 0 ] && step_end 1 "alacritty clone failed" && return 1
+  fi
+  if [ "$HW_ARM64" = 1 ] && cmd_exists "rustup"; then
+    rustup target add aarch64-apple-darwin &>/dev/null || true
+    rustup default stable-aarch64-apple-darwin &>/dev/null || true
   fi
   run_with_spinner "Building alacritty" bash -c "cd \"$alacritty_dir\" && make app"
   err=$?
@@ -428,16 +454,16 @@ install_fd
 install_zsh
 install_grc
 install_chatgptcli
-install_alacritty
-install_ocaml
-install_ag
-install_amethyst
-
 # programming languages
 install_fnm
 install_rustup
 install_node
 install_clojure
+
+install_alacritty
+#install_ocaml
+#install_ag
+#install_amethyst
 
 print_info "  Finished installing base applications"
 # TODO: set up a cronjob on your computer for this

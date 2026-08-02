@@ -12,6 +12,41 @@ for _arg in "$@"; do
   esac
 done
 
+# --- Architecture detection ---
+# hw.optional.arm64 reflects the physical chip even when this process is
+# running translated under Rosetta, unlike `uname -m`/`arch`.
+HW_ARM64=0
+[ "$(sysctl -n hw.optional.arm64 2>/dev/null)" = "1" ] && HW_ARM64=1
+
+# sysctl.proc_translated is 1 only when *this* process is x86_64 code running
+# on Apple Silicon via Rosetta (absent/0 on real Intel and on native arm64).
+IS_TRANSLATED=0
+[ "$(sysctl -n sysctl.proc_translated 2>/dev/null)" = "1" ] && IS_TRANSLATED=1
+
+# Prefix a native Homebrew install uses on this hardware.
+if [ "$HW_ARM64" = 1 ]; then
+  HOMEBREW_PREFIX="/opt/homebrew"
+else
+  HOMEBREW_PREFIX="/usr/local"
+fi
+export HW_ARM64 IS_TRANSLATED HOMEBREW_PREFIX
+
+# Call before doing any installing/building. Running translated on Apple
+# Silicon makes brew/cargo/make silently produce Intel-only binaries under
+# /usr/local instead of native arm64 ones under /opt/homebrew.
+assert_native_arch() {
+  if [ "$HW_ARM64" = 1 ] && [ "$IS_TRANSLATED" = 1 ]; then
+    print_error "Running under Rosetta on Apple Silicon hardware"
+    print_info "  This shell is translated (x86_64) even though this Mac has an Apple Silicon chip."
+    print_info "  Continuing would install Homebrew and everything else as Intel-only under /usr/local."
+    print_info ""
+    print_info "  Fix one of these, then re-run:"
+    print_info "    - Terminal/iTerm2: select the app, Cmd+I -> uncheck 'Open using Rosetta', quit and reopen it"
+    print_info "    - Or run this script from a native shell:  arch -arm64 /bin/zsh"
+    exit 1
+  fi
+}
+
 # --- Print helpers ---
 
 print_error() {
