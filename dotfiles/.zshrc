@@ -102,4 +102,3 @@ esac
 
 # homebrew
 eval "$(/opt/homebrew/bin/brew shellenv)"
-[ -d "$HOMEBREW_PREFIX/opt/openjdk/bin" ] && export PATH="$HOMEBREW_PREFIX/opt/openjdk/bin:$PATH"
