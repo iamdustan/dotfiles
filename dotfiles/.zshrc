@@ -21,8 +21,11 @@ bindkey jj vi-cmd-mode
 [[ -f ~/.aliases ]] && source ~/.aliases
 [[ -f ~/.config/.aliases ]] && source ~/.config/.aliases
 
+# load homebrew's completion functions
+fpath=(/opt/homebrew/share/zsh/site-functions $fpath)
+
 # load our own completion functions
-fpath=(~/.zsh/completion /usr/local/share/zsh/site-functions $fpath)
+fpath=(~/.zsh/completion $fpath)
 
 # completion
 autoload -U compinit
@@ -97,4 +100,5 @@ case ":$PATH:" in
 esac
 # pnpm end
 
-
+# homebrew
+eval "$(/opt/homebrew/bin/brew shellenv)"

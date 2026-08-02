@@ -1,0 +1,71 @@
+#!/bin/bash
+#
+# Audit this Mac for Intel-only tools running on Apple Silicon hardware.
+# Read-only: reports findings, doesn't fix anything. Safe to run anytime.
+
+SETUP_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+source "$SETUP_ROOT/setup-common.sh" "$@"
+
+print_info "Hardware & shell"
+if [ "$HW_ARM64" = 1 ]; then
+  print_success "  chip: Apple Silicon (arm64)"
+else
+  print_success "  chip: Intel (x86_64)"
+fi
+if [ "$IS_TRANSLATED" = 1 ]; then
+  print_error "  this shell is running translated under Rosetta right now"
+  print_info "    -> Terminal/iTerm2: Cmd+I on the app -> uncheck 'Open using Rosetta'"
+else
+  print_success "  shell: native ($(uname -m))"
+fi
+printf '\n'
+
+print_info "Homebrew"
+if cmd_exists "brew"; then
+  brew_prefix="$(brew --prefix 2>/dev/null)"
+  if [ "$brew_prefix" = "$HOMEBREW_PREFIX" ]; then
+    print_success "  $brew_prefix (matches this hardware)"
+  else
+    print_error "  $brew_prefix (expected $HOMEBREW_PREFIX for this hardware)"
+    print_info "    -> installed under the wrong prefix; every formula from it is Intel-only"
+    print_info "    -> uninstall and reinstall: https://docs.brew.sh/Installation#uninstallation"
+  fi
+else
+  print_info "  not installed"
+fi
+printf '\n'
+
+print_info "Key binaries (flagging Intel-only where a universal/arm64 build should exist)"
+CHECK_CMDS=(brew node nvim tmux rg fzf fd gh cargo rustc fnm python3 git)
+found_issue=0
+for c in "${CHECK_CMDS[@]}"; do
+  path="$(command -v "$c" 2>/dev/null)" || continue
+  [ -n "$path" ] || continue
+  resolved="$(readlink -f "$path" 2>/dev/null || echo "$path")"
+  info="$(file -b "$resolved" 2>/dev/null)"
+  case "$info" in
+    *arm64*|*"Mach-O universal"*)
+      print_success "  $c ($resolved)"
+      ;;
+    *x86_64*)
+      if [ "$HW_ARM64" = 1 ]; then
+        print_error "  $c ($resolved) - Intel-only on Apple Silicon"
+        found_issue=1
+      else
+        print_success "  $c ($resolved)"
+      fi
+      ;;
+    *)
+      # not a Mach-O binary (script/wrapper) - nothing meaningful to check
+      ;;
+  esac
+done
+printf '\n'
+
+if [ "$found_issue" = 1 ]; then
+  print_error "Found Intel-only binaries on Apple Silicon hardware."
+  print_info "  Likely cause: setup was run once under Rosetta (translated Terminal/shell)."
+  print_info "  Fix: reinstall Homebrew natively, then re-run ./setup.sh from a native shell."
+else
+  print_success "No architecture mismatches found."
+fi
