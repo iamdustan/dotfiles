@@ -87,10 +87,8 @@ eval "$(fnm env)"
 # cargo (when rustup is installed)
 [[ -f $HOME/.cargo/env ]] && source $HOME/.cargo/env
 
-# ocaml
-eval `opam config env`
-
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+# fzf
+command -v fzf &>/dev/null && eval "$(fzf --zsh)"
 
 # pnpm
 export PNPM_HOME="/Users/iamdustan/Library/pnpm"

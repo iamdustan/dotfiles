@@ -159,6 +159,7 @@ install_clojure() {
 install_ocaml() {
   if cmd_exists "opam"; then
     step_start "Installing ocaml/opam"
+    append_zshrc_local 'eval `opam config env`'
     step_end 0 "ocaml and opam already installed"
     return 0
   fi
@@ -166,7 +167,9 @@ install_ocaml() {
   # TODO install these independently
   step_start "Installing ocaml/opam"
   run_with_spinner "Installing ocaml/opam" bash -c "brew install ocaml && brew install opam"
-  step_end $? "ocaml and opam installed"
+  local err=$?
+  [ $err -eq 0 ] && append_zshrc_local 'eval `opam config env`'
+  step_end $err "ocaml and opam installed"
 }
 
 # gh: GitHub CLI.
