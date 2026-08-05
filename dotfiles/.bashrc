@@ -32,3 +32,7 @@ export FZF_DEFAULT_COMMAND='rg --files --no-ignore --hidden --follow --glob "!.g
 
 # for eslint_d
 export ESLINT_USE_FLAT_CONFIG=true
+[ -f "$HOME/.rover/env" ] && source "$HOME/.rover/env"
+
+# Added by Antigravity CLI installer
+export PATH="$HOME/.local/bin:$PATH"

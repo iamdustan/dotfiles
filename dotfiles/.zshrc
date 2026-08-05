@@ -21,8 +21,15 @@ bindkey jj vi-cmd-mode
 [[ -f ~/.aliases ]] && source ~/.aliases
 [[ -f ~/.config/.aliases ]] && source ~/.config/.aliases
 
+# homebrew prefix (arm64: /opt/homebrew, intel: /usr/local)
+if [[ -x /opt/homebrew/bin/brew ]]; then
+  HOMEBREW_PREFIX=/opt/homebrew
+elif [[ -x /usr/local/bin/brew ]]; then
+  HOMEBREW_PREFIX=/usr/local
+fi
+
 # load homebrew's completion functions
-fpath=(/opt/homebrew/share/zsh/site-functions $fpath)
+[[ -n "$HOMEBREW_PREFIX" ]] && fpath=("$HOMEBREW_PREFIX/share/zsh/site-functions" $fpath)
 
 # load our own completion functions
 fpath=(~/.zsh/completion $fpath)
@@ -91,7 +98,7 @@ eval "$(fnm env)"
 command -v fzf &>/dev/null && eval "$(fzf --zsh)"
 
 # pnpm
-export PNPM_HOME="/Users/iamdustan/Library/pnpm"
+export PNPM_HOME="$HOME/Library/pnpm"
 case ":$PATH:" in
   *":$PNPM_HOME:"*) ;;
   *) export PATH="$PNPM_HOME:$PATH" ;;
@@ -99,4 +106,4 @@ esac
 # pnpm end
 
 # homebrew
-eval "$(/opt/homebrew/bin/brew shellenv)"
+[[ -n "$HOMEBREW_PREFIX" ]] && eval "$("$HOMEBREW_PREFIX/bin/brew" shellenv)"
