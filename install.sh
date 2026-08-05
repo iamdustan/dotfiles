@@ -48,14 +48,12 @@ install_homebrew() {
   fi
 }
 
-install_watchman() {
-  step_start "Installing watchman"
-  if ! cmd_exists "watchman"; then
-    run_with_spinner "Installing watchman" brew install watchman
-    step_end $? "watchman installed"
-  else
-    step_end 0 "watchman already installed"
-  fi
+# Base CLI tools (watchman, gh, git-delta, neovim, tmux, ripgrep, jq, fzf) and
+# nerd fonts: see ./Brewfile for the full list.
+install_brew_bundle() {
+  step_start "Installing base tools (brew bundle)"
+  run_with_spinner "Installing base tools (brew bundle)" brew bundle install --file="$SETUP_ROOT/Brewfile"
+  step_end $? "base tools installed (see Brewfile)"
 }
 
 install_fnm() {
@@ -172,29 +170,6 @@ install_ocaml() {
   step_end $err "ocaml and opam installed"
 }
 
-# gh: GitHub CLI.
-install_gh() {
-  step_start "Installing gh"
-  if ! cmd_exists "gh"; then
-    run_with_spinner "Installing gh" brew install gh
-    step_end $? "gh installed"
-  else
-    step_end 0 "gh already installed"
-  fi
-}
-
-# git-delta: Git diff pager with syntax highlighting.
-install_gitdelta() {
-  step_start "Installing git-delta"
-  if ! brew list git-delta >/dev/null 2>&1; then
-    run_with_spinner "Installing git-delta" brew install git-delta
-    step_end $? "git-delta installed"
-  else
-    step_end 0 "git-delta already installed"
-  fi
-}
-
-
 install_rustup() {
   if cmd_exists "cargo"; then
     step_start "Installing rustup/cargo"
@@ -250,30 +225,6 @@ install_alacritty() {
   step_end 0 "alacritty installed from source"
 }
 
-# vim for the modern era
-# https://neovim.io/
-install_neovim() {
-  step_start "Installing neovim"
-  if ! cmd_exists "nvim"; then
-    run_with_spinner "Installing neovim" brew install neovim/neovim/neovim
-    step_end $? "neovim (nvim) installed"
-  else
-    step_end 0 "neovim already installed"
-  fi
-}
-
-# terminal multiplexer
-# https://github.com/tmux/tmux/wiki
-install_tmux() {
-  step_start "Installing tmux"
-  if ! cmd_exists "tmux"; then
-    run_with_spinner "Installing tmux" brew install tmux
-    step_end $? "tmux installed"
-  else
-    step_end 0 "tmux already installed"
-  fi
-}
-
 # zsh / ohmyzsh is an interactive shell
 # https://ohmyz.sh/
 install_zsh() {
@@ -283,18 +234,6 @@ install_zsh() {
     step_end $? "zsh installed"
   else
     step_end 0 "zsh already installed"
-  fi
-}
-
-# fzf is a general-purpose command-line fuzzy finder.
-# https://github.com/junegunn/fzf
-install_fzf() {
-  step_start "Installing fzf"
-  if ! cmd_exists "fzf"; then
-    run_with_spinner "Installing fzf" brew install fzf
-    step_end $? "fzf installed"
-  else
-    step_end 0 "fzf already installed"
   fi
 }
 
@@ -308,27 +247,6 @@ install_ag() {
   step_start "Installing the_silver_searcher (ag)"
   run_with_spinner "Installing the_silver_searcher (ag)" brew install the_silver_searcher
   step_end $? "the_silver_searcher (ag) installed"
-}
-
-install_ripgrep() {
-  step_start "Installing ripgrep"
-  if ! cmd_exists "rg"; then
-    run_with_spinner "Installing ripgrep" brew install ripgrep
-    step_end $? "ripgrep (rg) installed"
-  else
-    step_end 0 "ripgrep (rg) already installed"
-  fi
-}
-
-# jq: JSON processor for CLI.
-install_jq() {
-  step_start "Installing jq"
-  if ! cmd_exists "jq"; then
-    run_with_spinner "Installing jq" brew install jq
-    step_end $? "jq installed"
-  else
-    step_end 0 "jq already installed"
-  fi
 }
 
 # fd: fast find alternative.
@@ -385,13 +303,6 @@ install_conduit() {
   print_note "      agents:" "Run setup-agents (during setup.sh -i or manually) to choose default provider and presets"
 }
 
-# Caskaydia Nerd Fonts. 2>&1 | cat so brew progress doesn't leak \r noise.
-install_fonts() {
-  step_start "Installing Caskaydia nerdfonts"
-  run_with_spinner "Installing Caskaydia nerdfonts" bash -c "brew install --cask font-caskaydia-cove-nerd-font font-caskaydia-mono-nerd-font 2>&1 | cat"
-  step_end $? "Caskaydia Cove and Mono nerdfonts installed"
-}
-
 # ChatGPT CLI. Prompts to add OPENAI_API_KEY to .zshrc.local if missing.
 install_chatgptcli() {
   if brew info chatgpt &>/dev/null; then
@@ -434,25 +345,17 @@ print_info "Installing base developer applications"
 
 # mac tools
 install_homebrew
-install_watchman
+install_brew_bundle
 
 # dev tools
-install_gh
 if [ "$INTERACTIVE" = 1 ] && cmd_exists "gh"; then
   if ! gh auth status &>/dev/null; then
     print_info "Authenticate with GitHub"
     gh auth login
   fi
 fi
-install_gitdelta
 install_lazygit
 install_conduit
-install_fonts
-install_neovim
-install_tmux
-install_ripgrep
-install_jq
-install_fzf
 install_fd
 install_zsh
 install_grc
